@@ -1,0 +1,77 @@
+description: >
+  This command deploys projects on VM over internet or VPN.
+
+parameters:
+  repository:
+    type: string
+    default: ""
+    description: >
+      Repository hosting deployment scripts.
+  service:
+    type: string
+    default: ""
+    description: >
+      Application service to deploy.
+  env:
+    type: enum
+    default: "prod"
+    enum: [ "staging", "preprod", "prod" ]
+    description: >
+      Running environment.
+  use_vpn:
+    type: boolean
+    default: true
+    description: >
+      Whether to connect to VPN for OnPrem deployments.
+  vpn_config:
+    type: string
+    default: "$VPN_CLIENT_CONFIG"
+    description: >
+      OpenVPN configuration file.
+      This must be a string base64 encoded with OpenVPN configuration.
+  vpn_username:
+    type: string
+    default: "$VPN_USERNAME"
+    description: >
+      Username of service account used for VPN connection.
+  vpn_password:
+    type: string
+    default: "$VPN_PASSWORD"
+    description: >
+      Password of service account used for VPN connection.
+
+steps:
+  - run:
+      name: System setup
+      command: |
+        echo "Add GitHub SSH config"
+        echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+
+        echo "Install Docker Compose"
+        curl -L https://github.com/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+        chmod +x ~/docker-compose
+        sudo mv ~/docker-compose /usr/local/bin/docker-compose
+  - when:
+      condition:
+        or:
+          - equal: [ staging, << parameters.env >> ]
+          - equal: [ preprod, << parameters.env >> ]
+      steps:
+        - update-version
+  - when:
+      condition: << parameters.use_vpn >>
+      steps:
+        - connect-vpn:
+            vpn_config: << parameters.vpn_config >>
+            vpn_username: << parameters.vpn_username >>
+            vpn_password: << parameters.vpn_password >>
+  - run:
+      name: Clone Deployment repository
+      command: |
+        git clone git@github.com:cospirit/<< parameters.repository >> deployment
+        cd deployment
+        make << parameters.env >>@deploy.<< parameters.service >>
+  - when:
+      condition: << parameters.use_vpn >>
+      steps:
+        - disconnect-vpn
