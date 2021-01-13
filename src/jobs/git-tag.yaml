@@ -1,0 +1,39 @@
+description: >
+  Create a GitHub tag from VERSION file.
+  VERSION file must be at root directory and up to date.
+
+machine: true
+
+parameters:
+  version_file:
+    type: string
+    default: "VERSION"
+    descripton: >
+      Name of the file that handles the current service version number.
+  tag_prefix:
+    type: string
+    default: "v"
+    description: >
+      Add a prefix for GitHub tag.
+  tag_suffix:
+    type: string
+    default: ""
+    description: >
+      Add a suffix for GitHub tag.
+  github_email:
+    type: string
+    default: "$GIT_USER_EMAIL"
+    description: >
+      Email of GitHub user used to push the new tag.
+  github_user:
+    type: string
+    default: "$GIT_USER_NAME"
+    description: >
+      Username of GitHub user used to push the new tag.
+steps:
+  - checkout
+  - run:
+      environment:
+        TAG: << parameters.tag_prefix >>$(cat << parameters.version_file >>)<< parameters.tag_suffix >>
+      name: Tag GitHub version
+      command: << include(scripts/git_tag.sh) >>
