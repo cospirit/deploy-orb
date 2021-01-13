@@ -1,5 +1,5 @@
 description: >
-  This command deploys projects on VM over internet or VPN.
+  This job deploys services on VM over internet or through VPN.
 
 parameters:
   repository:
@@ -66,7 +66,7 @@ steps:
             vpn_username: << parameters.vpn_username >>
             vpn_password: << parameters.vpn_password >>
   - run:
-      name: Clone Deployment repository
+      name: Deploy service << parameters.service >>
       command: |
         git clone git@github.com:cospirit/<< parameters.repository >> deployment
         cd deployment
