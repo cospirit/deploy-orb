@@ -1,0 +1,111 @@
+description: >
+  This command echos "Hello World" using file inclusion.
+
+parameters:
+  repository:
+    type: string
+    default: ""
+    description: >
+      Repository hosting deployment scripts.
+  service:
+    type: string
+    default: ""
+    description: >
+      Application service to deploy.
+  env:
+    type: enum
+    default: "prod"
+    enum: [ "staging", "preprod", "prod" ]
+    description: >
+      Running environment.
+  use_vpn:
+    type: boolean
+    default: true
+    description: >
+      Connect to VPN or not for OnPrem deployments.
+  vpn_config:
+    type: string
+    default: "$VPN_CLIENT_CONFIG"
+    description: >
+      OpenVPN configuration file.
+      This must be a string base64 encoded with OpenVPN configuration.
+  vpn_username:
+    type: string
+    default: "$VPN_USERNAME"
+    description: >
+      Username of service account used for VPN connection.
+  vpn_password:
+    type: string
+    default: "$VPN_PASSWORD"
+    description: >
+      Password of service account used for VPN connection.
+
+steps:
+  - run:
+      name: System setup
+      command: |
+        echo "Add GitHub SSH config"
+        echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+
+        echo "Install Docker Compose"
+        curl -L https://github.com/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+        chmod +x ~/docker-compose
+        sudo mv ~/docker-compose /usr/local/bin/docker-compose
+  - when:
+      condition:
+        equal: [ preprod, << parameters.env >> ]
+      steps:
+        - update-version
+  - when:
+      condition: << parameters.use_vpn >>
+      steps:
+        # https://support.circleci.com/hc/en-us/articles/360049397051-How-to-set-up-a-VPN-connection-during-builds-
+        - run:
+            name: Install VPN
+            command: |
+              sudo apt-get update
+              sudo apt-get install --allow-unauthenticated --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+                openvpn \
+                net-tools
+        - run:
+            name: Check IP before VPN connection
+            command: << include(scripts/check_ip.sh) >>
+        - run:
+            name: VPN Setup
+            background: true
+            environment:
+              VPN_CONFIG: << parameters.vpn_config >>
+              VPN_USERNAME: << parameters.vpn_username >>
+              VPN_PASSWORD: << parameters.vpn_password >>
+            command: |
+              phone_home=$(netstat -an | grep ':22 .*ESTABLISHED' | head -n1 | awk '{ split($5, a, ":"); print a[1] }')
+              # if you use macOS executor, you can uncomment this line, and comment the above line
+              # phone_home=$(netstat -an | grep '\.2222\s.*ESTABLISHED' | head -n1 | awk '{ split($5, a, "."); print a[1] "." a[2] "." a[3] "." a[4] }')
+              echo $phone_home
+
+              echo << parameters.vpn_config >> | base64 --decode > /tmp/config.ovpn
+              printf "<< parameters.vpn_username >>\n<< parameters.vpn_password >>" > /tmp/vpn.login
+              sudo openvpn \
+                --config /tmp/config.ovpn \
+                --auth-user-pass /tmp/vpn.login \
+                --route $phone_home 255.255.255.255 net_gateway \
+                --route 169.254.0.0 255.255.0.0 net_gateway
+        - run:
+            name: Wait for the connection to be established
+            command: sleep 20
+        - run:
+            name: Check IP after VPN connection
+            command: << include(scripts/check_ip.sh) >>
+  - run:
+      name: Clone Deployment repository
+      command: |
+        git clone git@github.com:cospirit/<< parameters.repository >> deployment
+        cd deployment
+        make << parameters.env >>@deploy.<< parameters.service >>
+  - when:
+      condition: << parameters.use_vpn >>
+      steps:
+        - run:
+            name: Disconnect from OpenVPN
+            command: killall openvpn || true
+            when: always
