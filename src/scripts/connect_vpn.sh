@@ -7,19 +7,19 @@ get_ip() {
 
 
 create_ovpn_files() {
-	echo "${VPN_CONFIG}" | base64 --decode > /tmp/config.ovpn
+	echo "${VPN_CONFIG}" | base64 -d > /tmp/config.ovpn
 	echo -e "${VPN_USERNAME}\n${VPN_PASSWORD}" > /tmp/vpn.login
 	
 }
 
 connect() {
-	ip==(get_ip)
+	ip="$(get_ip)"
 	create_ovpn_files
-	
+
 	sudo openvpn \
 		--config /tmp/config.ovpn \
 		--auth-user-pass /tmp/vpn.login \
-		--route $(echo "$ip") 255.255.255.255 net_gateway \
+		--route "$ip" 255.255.255.255 net_gateway \
 		--route 169.254.0.0 255.255.0.0 net_gateway
 }
 

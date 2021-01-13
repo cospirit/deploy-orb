@@ -4,15 +4,18 @@ setup() {
     source ./src/scripts/connect_vpn.sh
     source ./src/scripts/disconnect_vpn.sh
     source ./src/scripts/check_ip.sh
+    export VPN_CONFIG=$(echo "my OpenVPN configuration file" | base64)
 }
 
 @test '1: OpenVPN file created' {
-    # Capture the output of our "disconnect" function
     export VPN_USERNAME=john.doe@email.com
-    export VPN_PASSWORD=P4s$worD
+    export VPN_PASSWORD=P4s\$worD
     export VPN_LOGIN_FILE=am9obi5kb2VAZW1haWwuY29tClA0cyR3b3JECg==
     create_ovpn_files
-    [ -f /tmp/vpn.login ] && [ -f /tmp/config.ovpn ] && [ "${VPN_LOGIN_FILE}" == "$(base64 /tmp/vpn.login)" ]
+
+    [ -f /tmp/config.ovpn ]
+    [ -f /tmp/vpn.login ]
+    [ "${VPN_LOGIN_FILE}" == "$(base64 /tmp/vpn.login)" ]
 }
 
 # @test '2: Connect to VPN' {

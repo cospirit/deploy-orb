@@ -8,7 +8,7 @@ parameters:
   version_file:
     type: string
     default: "VERSION"
-    descripton: >
+    description: >
       Name of the file that handles the current service version number.
   tag_prefix:
     type: string
@@ -30,6 +30,7 @@ parameters:
     default: "$GIT_USER_NAME"
     description: >
       Username of GitHub user used to push the new tag.
+
 steps:
   - checkout
   - run:
