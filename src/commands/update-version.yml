@@ -1,0 +1,33 @@
+description: >
+  "Update and push application's version file"
+
+parameters:
+  pattern:
+    type: string
+    default: release\/v?(([0-9]+\.?){1,3}).*
+    description: >
+      Regex pattern of the branch used to extract version number.
+      VERSION file will be updated using this value.
+  version_file:
+    type: string
+    default: "VERSION"
+    description: >
+      Name of the file that handles the current service version number.
+  github_email:
+    type: string
+    default: "$GITHUB_USER_EMAIL"
+    description: >
+      GitHub user email of service account used to deploy.
+  github_user:
+    type: string
+    default: "$GITHUB_USER_NAME"
+    description: >
+      GitHub user name of service account used to deploy.
+
+steps:
+  - run:
+      name: Update << parameters.version_file >> file if needed
+      environment:
+        BRANCH_PATTERN: << parameters.pattern >>
+        FILE: << parameters.version_file >>
+      command: << include(scripts/update_version.sh) >>
