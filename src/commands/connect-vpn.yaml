@@ -21,18 +21,23 @@ steps:
       name: Install VPN
       command: |
         sudo apt-get update
-        sudo apt-get install --allow-unauthenticated --allow-downgrades --allow-remove-essential --allow-change-held-packages \
-          openvpn \
-          net-tools
+        sudo apt-get \
+          install \
+          --allow-unauthenticated \
+          --allow-downgrades \
+          --allow-remove-essential \
+          --allow-change-held-packages \
+            openvpn \
+            net-tools
   - run:
       name: Check IP before VPN connection
       command: << include(scripts/check_ip.sh) >>
 
   - run:
-      name: VPN Setup
+      name: Setup VPN
       background: true
       environment:
-        VPN_CONFIG: << parameters.vpn_config >>
+        VPN_CLIENT_CONFIG: << parameters.vpn_config >>
         VPN_USERNAME: << parameters.vpn_username >>
         VPN_PASSWORD: << parameters.vpn_password >>
       command: << include(scripts/connect_vpn.sh) >>

@@ -31,7 +31,7 @@ parameters:
   repository:
     type: string
     default: ""
-    description: "Repository hosting deployment scripts"
+    description: "Repository hosting Helm configurations"
   github_email:
     type: string
     default: "$GITHUB_USER_EMAIL"
