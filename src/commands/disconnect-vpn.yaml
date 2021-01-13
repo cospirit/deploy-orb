@@ -1,0 +1,8 @@
+description: >
+  Disconnect from VPN.
+
+steps:
+  - run:
+      name: Check IP after VPN connection
+      command: << include(scripts/disconnect_vpn.sh) >>
+      when: always
