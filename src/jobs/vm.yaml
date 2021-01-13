@@ -1,6 +1,8 @@
 description: >
   This job deploys services on VM over internet or through VPN.
 
+executor: default
+
 parameters:
   repository:
     type: string
