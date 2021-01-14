@@ -1,10 +1,15 @@
+requirements() {
+	if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+}
 
 check_ip() {
+	requirements
+
 	ifconfig
-    route -n
-    sudo netstat -anp
-    cat /etc/resolv.conf
-    curl checkip.amazonaws.com
+  route -n
+  $SUDO netstat -anp
+  cat /etc/resolv.conf
+  curl checkip.amazonaws.com
 }
 
 # Will not run if sourced for bats-core tests.

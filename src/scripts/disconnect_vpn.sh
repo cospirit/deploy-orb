@@ -6,13 +6,13 @@ requirements() {
 	if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
 }
 
-close_connection() {
+ovpn_close() {
 	$SUDO killall openvpn || true
 }
 
 disconnect() {
 	requirements
-	close_connection
+	ovpn_close
 }
 
 # Will not run if sourced for bats-core tests.
