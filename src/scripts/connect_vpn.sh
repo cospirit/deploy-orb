@@ -16,7 +16,7 @@ get_ip() {
 
 ovpn_config() {
 	echo "${VPN_CLIENT_CONFIG}" | base64 -d > /tmp/config.ovpn
-	echo -e "${VPN_USERNAME}\n${VPN_PASSWORD}" > /tmp/vpn.login
+	printf "${VPN_USERNAME}\n${VPN_PASSWORD}" > /tmp/vpn.login
 	
 }
 
