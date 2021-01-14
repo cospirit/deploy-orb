@@ -8,12 +8,13 @@ parameters:
     description: >
       Pick a specific circleci image variant:
       https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
-  env:
-    type: enum
-    default: "test"
-    enum: [ "dev", "test", "prod" ]
+  working_directory:
+    type: string
+    default: ~/src
+    description: >
+      Default working directory.
 
 machine:
   image: << parameters.image >>
 
-working_directory: ~/src
+working_directory: << parameters.working_directory >>

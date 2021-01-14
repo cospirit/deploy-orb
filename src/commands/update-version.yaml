@@ -14,13 +14,13 @@ parameters:
     description: >
       Name of the file that handles the current service version number.
   github_email:
-    type: string
-    default: "$GITHUB_USER_EMAIL"
+    type: env_var_name
+    default: "GITHUB_USER_EMAIL"
     description: >
       GitHub user email of service account used to deploy.
   github_user:
-    type: string
-    default: "$GITHUB_USER_NAME"
+    type: env_var_name
+    default: "GITHUB_USER_NAME"
     description: >
       GitHub user name of service account used to deploy.
 
@@ -30,4 +30,6 @@ steps:
       environment:
         BRANCH_PATTERN: << parameters.pattern >>
         FILE: << parameters.version_file >>
+        # GITHUB_USER_NAME: $<< parameters.github_user >>
+        # GITHUB_USER_EMAIL: $<< parameters.github_email >>
       command: << include(scripts/update_version.sh) >>

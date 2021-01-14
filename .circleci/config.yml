@@ -24,14 +24,7 @@ parameters:
 jobs:
   # Define one or more jobs which will utilize your orb's commands and parameters to validate your changes.
   integration-test-1:
-    docker:
-      - image: cimg/base:stable
-    steps:
-      - checkout
-      #- deploy/update-version
-  integration-test-2:
-    docker:
-      - image: cimg/base:stable
+    executor: deploy/default
     steps:
       - deploy/connect-vpn
       - deploy/disconnect-vpn
@@ -82,8 +75,13 @@ workflows:
       # Run any integration tests defined within the `jobs` key.
       - integration-test-1:
           context: cospirit
-      - integration-test-2:
+      - deploy/vm:
+          name: integration-test-2
           context: cospirit
+          service: cospirit-api
+          env: preprod
+          repository: docker-deployment
+          deploy_key: "96:06:e7:18:18:57:ea:3e:58:2c:37:e9:e1:98:26:5b"
       # Publish a semver version of the orb. relies on
       # the commit subject containing the text "[semver:patch|minor|major|skip]"
       # as that will determine whether a patch, minor or major

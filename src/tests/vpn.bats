@@ -13,8 +13,8 @@ setup() {
 @test '1: OpenVPN configuration files creation success' {
     export VPN_USERNAME=john.doe@email.com
     export VPN_PASSWORD=P4s\$worD
-    vpn_client_config_encoded=TXkgT3BlblZQTiBjb25maWd1cmF0aW9uIGZpbGUgY29udGVudC4K
-    vpn_client_login_file=$(printf "${VPN_USERNAME}\n${VPN_PASSWORD}")
+    vpn_client_config_encoded=TXkgZGVjb2RlZCBPcGVuVlBOIGNvbmZpZ3VyYXRpb24gZmlsZSBjb250ZW50Lgo=
+    vpn_client_login_file=$(printf "%s\n%s" "${VPN_USERNAME}" "${VPN_PASSWORD}")
 
     ovpn_config
 
@@ -25,8 +25,8 @@ setup() {
 }
 
 @test '2: Fail if OpenVPN is not installed' {
-	run requirements
-	
-	[ "$status" -eq 1 ]
+    run requirements
+
+    [ "$status" -eq 1 ]
     [ "$output" == "OpenVPN is required to connect to VPN" ]
 }

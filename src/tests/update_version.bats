@@ -4,11 +4,11 @@ setup() {
     export BRANCH_PATTERN="release\/v?(([0-9]+\.?){1,3}).*"
     export FILE="VERSION"
 
-	echo "1.0" > "${FILE}"
+    echo "1.0" > "${FILE}"
 }
 
 teardown() {
-	if [[ -f "${FILE}" ]]; then rm "${FILE}"; fi
+    if [[ -f "${FILE}" ]]; then rm "${FILE}"; fi
 }
 
 @test '1: VERSION file update succeed' {

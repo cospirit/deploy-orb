@@ -6,7 +6,6 @@ executor: default
 parameters:
   service:
     type: string
-    default: ""
     description: >
       Application service to deploy.
       - REQUIRED -
@@ -18,10 +17,14 @@ parameters:
       Running environment.
   repository:
     type: string
-    default: ""
     description: >
       Name of the repository hosting deployment scripts.
       It automaticatlly and only uses GitHub repositories.
+      - REQUIRED -
+  deploy_key:
+    type: string
+    description: >
+      Fingerprint of the SSH key use to deploy on servers.
       - REQUIRED -
   use_vpn:
     type: boolean
@@ -29,18 +32,18 @@ parameters:
     description: >
       Whether to connect to VPN for OnPrem deployments.
   vpn_config:
-    type: string
-    default: "$VPN_CLIENT_CONFIG"
+    type: env_var_name
+    default: "VPN_CLIENT_CONFIG"
     description: >
       OpenVPN configuration file content encoded in base64.
   vpn_username:
-    type: string
-    default: "$VPN_USERNAME"
+    type: env_var_name
+    default: "VPN_USERNAME"
     description: >
       Username of service account used for VPN connection.
   vpn_password:
-    type: string
-    default: "$VPN_PASSWORD"
+    type: env_var_name
+    default: "VPN_PASSWORD"
     description: >
       Password of service account used for VPN connection.
   vpn_connection_waiting_time:
@@ -48,6 +51,27 @@ parameters:
     default: 20
     description: >
       Time in second the jobs must wait to ensure the VPN connection is etablised.
+  pattern:
+    type: string
+    default: release\/v?(([0-9]+\.?){1,3}).*
+    description: >
+      Regex pattern of the branch used to extract version number.
+      VERSION file will be updated using this value.
+  version_file:
+    type: string
+    default: "VERSION"
+    description: >
+      Name of the file that handles the current service version number.
+  github_email:
+    type: env_var_name
+    default: "GITHUB_USER_EMAIL"
+    description: >
+      GitHub user email of service account used to deploy.
+  github_user:
+    type: env_var_name
+    default: "GITHUB_USER_NAME"
+    description: >
+      GitHub user name of service account used to deploy.
 
 steps:
   - run:
@@ -66,7 +90,11 @@ steps:
           - equal: [ staging, << parameters.env >> ]
           - equal: [ preprod, << parameters.env >> ]
       steps:
-        - update-version
+        - update-version:
+            pattern: << parameters.pattern >>
+            version_file: << parameters.version_file >>
+            github_email: <<parameters.github_email >>
+            github_user: << parameters.github_user >>
   - when:
       condition: << parameters.use_vpn >>
       steps:
@@ -75,10 +103,13 @@ steps:
             vpn_username: << parameters.vpn_username >>
             vpn_password: << parameters.vpn_password >>
             vpn_connection_waiting_time: << parameters.vpn_connection_waiting_time >>
+  - add_ssh_keys:
+      fingerprints:
+        - "<< parameters.deploy_key >>"
   - run:
       name: Deploy service << parameters.service >>
       command: |
-        git clone git@github.com:cospirit/<< parameters.repository >> deployment
+        git clone git@github.com:cospirit/<< parameters.repository >>.git -b feature/devops/update-vcs deployment
         cd deployment
         make << parameters.env >>@deploy.<< parameters.service >>
   - when:
