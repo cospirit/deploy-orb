@@ -17,6 +17,11 @@ parameters:
     default: "$VPN_PASSWORD"
     description: >
       Password of service account used for VPN connection.
+  vpn_connection_waiting_time:
+    type: integer
+    default: 20
+    description: >
+      Time in second the jobs must wait to ensure the VPN connection is etablised.
 
 steps:
   # https://support.circleci.com/hc/en-us/articles/360049397051-How-to-set-up-a-VPN-connection-during-builds-
@@ -35,7 +40,6 @@ steps:
   - run:
       name: Check IP before VPN connection
       command: << include(scripts/check_ip.sh) >>
-
   - run:
       name: Setup VPN
       background: true
@@ -46,7 +50,7 @@ steps:
       command: << include(scripts/connect_vpn.sh) >>
   - run:
       name: Wait for the connection to be established
-      command: sleep 20
+      command: sleep << parameters.vpn_connection_waiting_time >>
   - run:
       name: Check IP after VPN connection
       command: << include(scripts/check_ip.sh) >>

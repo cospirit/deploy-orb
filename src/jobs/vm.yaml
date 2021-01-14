@@ -40,6 +40,11 @@ parameters:
     default: "$VPN_PASSWORD"
     description: >
       Password of service account used for VPN connection.
+  vpn_connection_waiting_time:
+    type: integer
+    default: 20
+    description: >
+      Time in second the jobs must wait to ensure the VPN connection is etablised.
 
 steps:
   - run:
@@ -66,6 +71,7 @@ steps:
             vpn_config: << parameters.vpn_config >>
             vpn_username: << parameters.vpn_username >>
             vpn_password: << parameters.vpn_password >>
+            vpn_connection_waiting_time: << parameters.vpn_connection_waiting_time >>
   - run:
       name: Deploy service << parameters.service >>
       command: |
