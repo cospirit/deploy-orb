@@ -1,11 +1,13 @@
 # Runs prior to every test
 setup() {
-    # Load our script file.
+    # Because all scripts have 'requirements' function,
+    # they will override each together.
+    # So it's important that the tested one was sourced last.
     source ./src/scripts/check_ip.sh
     source ./src/scripts/connect_vpn.sh
     source ./src/scripts/disconnect_vpn.sh
     export SUDO=""
-    export VPN_CLIENT_CONFIG=$(echo "my OpenVPN configuration file" | base64)
+    export VPN_CLIENT_CONFIG=$(echo "my OpenVPN configuration file content" | base64)
 }
 
 @test '1: OpenVPN configuration files creation success' {
