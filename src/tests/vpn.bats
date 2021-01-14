@@ -1,4 +1,3 @@
-# Runs prior to every test
 setup() {
     # Because all scripts have 'requirements' function,
     # they will override each together.
@@ -6,15 +5,16 @@ setup() {
     source ./src/scripts/check_ip.sh
     source ./src/scripts/connect_vpn.sh
     source ./src/scripts/disconnect_vpn.sh
+
     export SUDO=""
-    export VPN_CLIENT_CONFIG=$(echo "My OpenVPN configuration file content." | base64)
+    export VPN_CLIENT_CONFIG=$(echo "My decoded OpenVPN configuration file content." | base64)
 }
 
 @test '1: OpenVPN configuration files creation success' {
     export VPN_USERNAME=john.doe@email.com
     export VPN_PASSWORD=P4s\$worD
     vpn_client_config_encoded=TXkgT3BlblZQTiBjb25maWd1cmF0aW9uIGZpbGUgY29udGVudC4K
-    vpn_client_login_file=$(echo -e "${VPN_USERNAME}\n${VPN_PASSWORD}")
+    vpn_client_login_file=$(printf "${VPN_USERNAME}\n${VPN_PASSWORD}")
 
     ovpn_config
 

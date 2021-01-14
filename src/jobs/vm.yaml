@@ -4,22 +4,25 @@ description: >
 executor: default
 
 parameters:
-  repository:
-    type: string
-    default: ""
-    description: >
-      Repository hosting deployment scripts.
   service:
     type: string
     default: ""
     description: >
       Application service to deploy.
+      - REQUIRED -
   env:
     type: enum
     default: "prod"
     enum: [ "staging", "preprod", "prod" ]
     description: >
       Running environment.
+  repository:
+    type: string
+    default: ""
+    description: >
+      Name of the repository hosting deployment scripts.
+      It automaticatlly and only uses GitHub repositories.
+      - REQUIRED -
   use_vpn:
     type: boolean
     default: true
