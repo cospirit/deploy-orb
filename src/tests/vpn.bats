@@ -1,9 +1,9 @@
 # Runs prior to every test
 setup() {
     # Load our script file.
+    source ./src/scripts/check_ip.sh
     source ./src/scripts/connect_vpn.sh
     source ./src/scripts/disconnect_vpn.sh
-    source ./src/scripts/check_ip.sh
     export SUDO=""
     export VPN_CLIENT_CONFIG=$(echo "my OpenVPN configuration file" | base64)
 }
