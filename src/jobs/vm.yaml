@@ -29,8 +29,7 @@ parameters:
     type: string
     default: "$VPN_CLIENT_CONFIG"
     description: >
-      OpenVPN configuration file.
-      This must be a string base64 encoded with OpenVPN configuration.
+      OpenVPN configuration file content encoded in base64.
   vpn_username:
     type: string
     default: "$VPN_USERNAME"

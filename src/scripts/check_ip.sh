@@ -1,8 +1,13 @@
+requirements() {
+	if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
+}
 
 check_ip() {
+	requirements
+	
 	ifconfig
     route -n
-    sudo netstat -anp
+    $SUDO netstat -anp
     cat /etc/resolv.conf
     curl checkip.amazonaws.com
 }

@@ -8,12 +8,10 @@ setup() {
 }
 
 teardown() {
-	if [[ -f "${FILE}" ]]; then
-		rm "${FILE}"
-	fi
+	if [[ -f "${FILE}" ]]; then rm "${FILE}"; fi
 }
 
-@test '1: Update VERSION file' {
+@test '1: VERSION file update succeed' {
     # Mock environment variables or functions by exporting them (after the script has been sourced)
     export CIRCLE_BRANCH="release/v1.1"
     export VERSION=$(echo "${CIRCLE_BRANCH}" | sed -E "s/${BRANCH_PATTERN}/\\1/")
