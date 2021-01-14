@@ -4,12 +4,12 @@ requirements() {
 
 check_ip() {
 	requirements
-	
+
 	ifconfig
-    route -n
-    $SUDO netstat -anp
-    cat /etc/resolv.conf
-    curl checkip.amazonaws.com
+  route -n
+  $SUDO netstat -anp
+  cat /etc/resolv.conf
+  curl checkip.amazonaws.com
 }
 
 # Will not run if sourced for bats-core tests.
