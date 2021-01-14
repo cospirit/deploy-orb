@@ -32,6 +32,9 @@ jobs:
   integration-test-2:
     docker:
       - image: cimg/base:stable
+    environment:
+      VPN_USERNAME: julien.grand@cospirit.com
+      VPN_PASSWORD: 6Sbz4kU2!
     steps:
       - deploy/connect-vpn
       - deploy/disconnect-vpn

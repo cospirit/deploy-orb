@@ -8,19 +8,19 @@ setup() {
     export VPN_CLIENT_CONFIG=$(echo "my OpenVPN configuration file" | base64)
 }
 
-@test '1: OpenVPN file created' {
+@test '1: OpenVPN configuration files creation success' {
     export VPN_USERNAME=john.doe@email.com
     export VPN_PASSWORD=P4s\$worD
-    export VPN_LOGIN_FILE=am9obi5kb2VAZW1haWwuY29tClA0cyR3b3JECg==
+    export VPN_CLIENT_CONFIG_ENCODED=bXkgT3BlblZQTiBjb25maWd1cmF0aW9uIGZpbGUK
 
-    create_ovpn_files
+    ovpn_config
 
     [ -f /tmp/config.ovpn ]
     [ -f /tmp/vpn.login ]
-    [ "${VPN_LOGIN_FILE}" == "$(base64 /tmp/vpn.login)" ]
+    [ "${VPN_CLIENT_CONFIG_ENCODED}" == "$(base64 /tmp/config.ovpn)" ]
 }
 
-@test '2: openvpn not installed' {
+@test '2: Fail if OpenVPN is not installed' {
 	run requirements
 	
 	[ "$status" -eq 1 ]

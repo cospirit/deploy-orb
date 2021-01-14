@@ -14,13 +14,13 @@ get_ip() {
 }
 
 
-create_ovpn_files() {
+ovpn_config() {
 	echo "${VPN_CLIENT_CONFIG}" | base64 -d > /tmp/config.ovpn
 	echo -e "${VPN_USERNAME}\n${VPN_PASSWORD}" > /tmp/vpn.login
 	
 }
 
-open_connection() {
+ovpn_connect() {
 	$SUDO openvpn \
 		--config /tmp/config.ovpn \
 		--auth-user-pass /tmp/vpn.login \
@@ -30,8 +30,8 @@ open_connection() {
 
 connect() {
 	requirements
-	create_ovpn_files
-	open_connection "$(get_ip)"
+	ovpn_config
+	ovpn_connect "$(get_ip)"
 }
 
 # Will not run if sourced for bats-core tests.
