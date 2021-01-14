@@ -7,13 +7,13 @@ setup() {
     source ./src/scripts/connect_vpn.sh
     source ./src/scripts/disconnect_vpn.sh
     export SUDO=""
-    export VPN_CLIENT_CONFIG=$(echo "my OpenVPN configuration file content" | base64)
+    export VPN_CLIENT_CONFIG=$(echo "My OpenVPN configuration file content." | base64)
 }
 
 @test '1: OpenVPN configuration files creation success' {
     export VPN_USERNAME=john.doe@email.com
     export VPN_PASSWORD=P4s\$worD
-    export VPN_CLIENT_CONFIG_ENCODED=bXkgT3BlblZQTiBjb25maWd1cmF0aW9uIGZpbGUK
+    export VPN_CLIENT_CONFIG_ENCODED=TXkgT3BlblZQTiBjb25maWd1cmF0aW9uIGZpbGUgY29udGVudC4K
 
     ovpn_config
 
