@@ -2,8 +2,6 @@ description: >
   Create a GitHub tag from VERSION file.
   VERSION file must be at root directory and up to date.
 
-machine: true
-
 parameters:
   version_file:
     type: string
@@ -20,19 +18,25 @@ parameters:
     default: ""
     description: >
       Add a suffix for GitHub tag.
-  github_email:
-    type: string
-    default: "$GIT_USER_EMAIL"
+  git_email:
+    type: env_var_name
+    default: "GIT_USER_EMAIL"
     description: >
-      Email of GitHub user used to push the new tag.
-  github_user:
-    type: string
-    default: "$GIT_USER_NAME"
+      Name of the environment variable for the email of
+      Git user used to push the new tag.
+  git_user:
+    type: env_var_name
+    default: "GIT_USER_NAME"
     description: >
-      Username of GitHub user used to push the new tag.
+      Name of the environment variable for the user name of
+      Git user used to push the new tag.
 
 steps:
-  - checkout
+  - run:
+      name: Set env vars
+      command: |
+        echo "export GIT_USER_EMAIL=${<< parameters.git_email >>}" >> $BASH_ENV
+        echo "export GIT_USER_NAME=${<< parameters.git_user >>}" >> $BASH_ENV
   - run:
       environment:
         TAG: << parameters.tag_prefix >>$(cat << parameters.version_file >>)<< parameters.tag_suffix >>

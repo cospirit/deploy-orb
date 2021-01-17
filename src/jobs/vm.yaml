@@ -8,7 +8,6 @@ parameters:
     type: string
     description: >
       Application service to deploy.
-      - REQUIRED -
   env:
     type: enum
     default: "prod"
@@ -20,12 +19,10 @@ parameters:
     description: >
       Name of the repository hosting deployment scripts.
       It automaticatlly and only uses GitHub repositories.
-      - REQUIRED -
   deploy_key:
     type: string
     description: >
       Fingerprint of the SSH key use to deploy on servers.
-      - REQUIRED -
   use_vpn:
     type: boolean
     default: true
@@ -62,16 +59,29 @@ parameters:
     default: "VERSION"
     description: >
       Name of the file that handles the current service version number.
-  github_email:
-    type: env_var_name
-    default: "GITHUB_USER_EMAIL"
+  create_git_tag:
+    type: boolean
+    default: true
     description: >
-      GitHub user email of service account used to deploy.
-  github_user:
+      Whether to create git tag after successful production deployments.
+      The value of the tag is get from VERSION file content.
+  git_email:
     type: env_var_name
-    default: "GITHUB_USER_NAME"
+    default: "GIT_USER_EMAIL"
     description: >
-      GitHub user name of service account used to deploy.
+      Name of the environment variable for the email of
+      Git user used to push the new tag.
+  git_user:
+    type: env_var_name
+    default: "GIT_USER_NAME"
+    description: >
+      Name of the environment variable for the user name of
+      Git user used to push the new tag.
+  docker_compose_version:
+    type: string
+    default: "1.27.4"
+    description: >
+      Version of Docker Compose to use for deployment environment files.
 
 steps:
   - run:
@@ -81,7 +91,7 @@ steps:
         echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
         echo "Install Docker Compose"
-        curl -L https://github.com/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+        curl -L https://github.com/docker/compose/releases/download/<< parameters.docker_compose_version >>/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
         chmod +x ~/docker-compose
         sudo mv ~/docker-compose /usr/local/bin/docker-compose
   - when:
@@ -93,8 +103,8 @@ steps:
         - update-version:
             pattern: << parameters.pattern >>
             version_file: << parameters.version_file >>
-            github_email: <<parameters.github_email >>
-            github_user: << parameters.github_user >>
+            git_email: <<parameters.git_email >>
+            git_user: << parameters.git_user >>
   - when:
       condition: << parameters.use_vpn >>
       steps:
@@ -116,3 +126,14 @@ steps:
       condition: << parameters.use_vpn >>
       steps:
         - disconnect-vpn
+  - when:
+      condition:
+        and:
+          - << parameters.create_git_tag >>
+          - equal: [ prod, << parameters.env >> ]
+      steps:
+        - git-tag:
+            version_file: << parameters.version_file >>
+            git_email: <<parameters.git_email >>
+            git_user: << parameters.git_user >>
+

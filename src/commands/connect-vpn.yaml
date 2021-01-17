@@ -49,10 +49,6 @@ steps:
   - run:
       name: Setup VPN
       background: true
-      # environment:
-      #   CLIENT_CONFIG: ${VPN_CLIENT_CONFIG}
-      #   USERNAME: ${<<parameters.vpn_username>>}
-      #   PASSWORD: ${<<parameters.vpn_password>>}
       command: << include(scripts/connect_vpn.sh) >>
   - run:
       name: Wait for the connection to be established
