@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
  - Current development changes [ to be moved to release ]
 
-## [1.0.0] - YYYY-MM-DD
+## [0.1.3] - 2020-01-18
 ### Added
  - Initial Release
 ### Changed
@@ -16,4 +16,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Initial Release
 
 
-[1.0.0]: GITHUB TAG URL
+[0.1.3]: GITHUB https://github.com/cospirit/deploy-orb/tags/v0.1.3

@@ -1,13 +1,58 @@
 description: >
-  Sample example description.
-# Provide a use-case based example for using this orb.
-# Everything in the `usage` section will be displayed in the orb registry.
-# Comments are not retained.
+  Sample example to use `vm` job to deploy an app on an internal or external virtual machine and create a git tag.
+  In this example, the app is deployed through VPN connection in `staging` environment and not in `prod`.
+  In staging environment, the `VERSION` file is updated on release branches.
+  In production, when the deployment successfully finished, the git tag creation is triggered.
+  The tag is corresponding to the content of a file (`VERSION` by default).
+  The deployments are executed with deployer only for the moment.
 usage:
   version: 2.1
   orbs:
-    <orb-name>: <namespace>/<orb-name>@1.2.3
+    deploy: cospirit/deploy@1.2.3
+
+  jobs:
+    build:
+      parameters:
+        env:
+          type: string
+          default: "dev"
+          description: >
+            Running environment.
+      docker:
+        - image: cospirit/node:14.12
+          environment:
+            NODE_ENV: << parameters.env >>
+      steps:
+        - checkout
+        - deploy/update-version:
+            filter:
+              only: /release\/v?([0-9]+\.?){1,3}/
+        - run: |
+            npm install
+            npm build
+      working_directory: /srv/app
+
   workflows:
     use-my-orb:
       jobs:
-        - <orb-name>/<job-name>
+        - build
+        - deploy/vm:
+            context: my-staging-context
+            service: my-awesome-app
+            env: staging
+            repository: deployment
+            name: deploy-staging
+            requires: [ build ]
+            filters:
+              branches:
+                only:
+                  - develop
+                  - /release\/v?([0-9]+\.?){1,3}/
+        - deploy/vm:
+            context: my-prod-context
+            service: my-awesome-app
+            env: prod
+            use_vpn: false
+            deploy_key: "f0:da:4f:34:8e:25:c3"
+            name: deploy-prod
+            requires: [ build ]

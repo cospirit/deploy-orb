@@ -4,14 +4,8 @@ description: >
 executor: default
 
 parameters:
-  repository:
-    type: string
-    default: ""
-    description: >
-      Repository hosting deployment scripts.
   service:
     type: string
-    default: ""
     description: >
       Application service to deploy.
   env:
@@ -20,26 +14,74 @@ parameters:
     enum: [ "staging", "preprod", "prod" ]
     description: >
       Running environment.
+  repository:
+    type: string
+    description: >
+      Name of the repository hosting deployment scripts.
+      It automaticatlly and only uses GitHub repositories.
+  deploy_key:
+    type: string
+    description: >
+      Fingerprint of the SSH key use to deploy on servers.
   use_vpn:
     type: boolean
     default: true
     description: >
       Whether to connect to VPN for OnPrem deployments.
   vpn_config:
-    type: string
-    default: "$VPN_CLIENT_CONFIG"
+    type: env_var_name
+    default: "VPN_CLIENT_CONFIG"
     description: >
       OpenVPN configuration file content encoded in base64.
   vpn_username:
-    type: string
-    default: "$VPN_USERNAME"
+    type: env_var_name
+    default: "VPN_USERNAME"
     description: >
       Username of service account used for VPN connection.
   vpn_password:
-    type: string
-    default: "$VPN_PASSWORD"
+    type: env_var_name
+    default: "VPN_PASSWORD"
     description: >
       Password of service account used for VPN connection.
+  vpn_connection_waiting_time:
+    type: integer
+    default: 20
+    description: >
+      Time in second the jobs must wait to ensure the VPN connection is etablised.
+  pattern:
+    type: string
+    default: release\/v?(([0-9]+\.?){1,3}).*
+    description: >
+      Regex pattern of the branch used to extract version number.
+      VERSION file will be updated using this value.
+  version_file:
+    type: string
+    default: "VERSION"
+    description: >
+      Name of the file that handles the current service version number.
+  create_git_tag:
+    type: boolean
+    default: true
+    description: >
+      Whether to create git tag after successful production deployments.
+      The value of the tag is get from VERSION file content.
+  git_email:
+    type: env_var_name
+    default: "GIT_USER_EMAIL"
+    description: >
+      Name of the environment variable for the email of
+      Git user used to push the new tag.
+  git_user:
+    type: env_var_name
+    default: "GIT_USER_NAME"
+    description: >
+      Name of the environment variable for the user name of
+      Git user used to push the new tag.
+  docker_compose_version:
+    type: string
+    default: "1.27.4"
+    description: >
+      Version of Docker Compose to use for deployment environment files.
 
 steps:
   - run:
@@ -49,7 +91,7 @@ steps:
         echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
 
         echo "Install Docker Compose"
-        curl -L https://github.com/docker/compose/releases/download/1.27.4/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+        curl -L https://github.com/docker/compose/releases/download/<< parameters.docker_compose_version >>/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
         chmod +x ~/docker-compose
         sudo mv ~/docker-compose /usr/local/bin/docker-compose
   - when:
@@ -58,7 +100,11 @@ steps:
           - equal: [ staging, << parameters.env >> ]
           - equal: [ preprod, << parameters.env >> ]
       steps:
-        - update-version
+        - update-version:
+            pattern: << parameters.pattern >>
+            version_file: << parameters.version_file >>
+            git_email: <<parameters.git_email >>
+            git_user: << parameters.git_user >>
   - when:
       condition: << parameters.use_vpn >>
       steps:
@@ -66,13 +112,28 @@ steps:
             vpn_config: << parameters.vpn_config >>
             vpn_username: << parameters.vpn_username >>
             vpn_password: << parameters.vpn_password >>
+            vpn_connection_waiting_time: << parameters.vpn_connection_waiting_time >>
+  - add_ssh_keys:
+      fingerprints:
+        - "<< parameters.deploy_key >>"
   - run:
       name: Deploy service << parameters.service >>
       command: |
-        git clone git@github.com:cospirit/<< parameters.repository >> deployment
+        git clone git@github.com:cospirit/<< parameters.repository >>.git -b feature/devops/update-vcs deployment
         cd deployment
         make << parameters.env >>@deploy.<< parameters.service >>
   - when:
       condition: << parameters.use_vpn >>
       steps:
         - disconnect-vpn
+  - when:
+      condition:
+        and:
+          - << parameters.create_git_tag >>
+          - equal: [ prod, << parameters.env >> ]
+      steps:
+        - git-tag:
+            version_file: << parameters.version_file >>
+            git_email: <<parameters.git_email >>
+            git_user: << parameters.git_user >>
+

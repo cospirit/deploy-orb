@@ -13,18 +13,25 @@ parameters:
     default: "VERSION"
     description: >
       Name of the file that handles the current service version number.
-  github_email:
-    type: string
-    default: "$GITHUB_USER_EMAIL"
+  git_email:
+    type: env_var_name
+    default: "GIT_USER_EMAIL"
     description: >
-      GitHub user email of service account used to deploy.
-  github_user:
-    type: string
-    default: "$GITHUB_USER_NAME"
+      Name of the environment variable for the email of
+      Git user used to push the new tag.
+  git_user:
+    type: env_var_name
+    default: "GIT_USER_NAME"
     description: >
-      GitHub user name of service account used to deploy.
+      Name of the environment variable for the user name of
+      Git user used to push the new tag.
 
 steps:
+  - run:
+      name: Set env vars
+      command: |
+        echo "export GIT_USER_EMAIL=${<< parameters.git_email >>}" >> $BASH_ENV
+        echo "export GIT_USER_NAME=${<< parameters.git_user >>}" >> $BASH_ENV
   - run:
       name: Update << parameters.version_file >> file if needed
       environment:

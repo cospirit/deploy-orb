@@ -33,6 +33,7 @@ development@test.bats:
 
 development@orb.validate:
 	$(CIRCLECI_CMD) orb validate src/@orb.yml
+	docker run --rm -it -v $(shell pwd):/src/deployment -w /src/deployment singapore/lint-condo yamllint src
 
 development@orb.pack:
 	$(CIRCLECI_CMD) orb pack src/
