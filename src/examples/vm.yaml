@@ -1,9 +1,9 @@
 description: >
-  Sample example to use `vm` job to deploy an app on an internal or external virtual machine and create a git tag.
-  In this example, the app is deployed through VPN connection in `staging` environment and not in `prod`.
-  In staging environment, the `VERSION` file is updated on release branches.
+  Sample example to use the vm job to deploy an app on an internal or external virtual machine and create a git tag.
+  In this example, the app is deployed through VPN connection in staging environment and not in prod.
+  In staging environment, the VERSION file is updated on release branches.
   In production, when the deployment successfully finished, the git tag creation is triggered.
-  The tag is corresponding to the content of a file (`VERSION` by default).
+  The tag is corresponding to the content of a file (VERSION by default).
   The deployments are executed with deployer only for the moment.
 usage:
   version: 2.1
