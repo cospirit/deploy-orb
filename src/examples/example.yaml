@@ -53,8 +53,6 @@ usage:
             service: my-awesome-app
             env: prod
             use_vpn: false
+            deploy_key: "f0:da:4f:34:8e:25:c3"
             name: deploy-prod
             requires: [ build ]
-        - deploy/git-tag:
-            context: my-prod-context
-            requires: [ deploy-prod ]
