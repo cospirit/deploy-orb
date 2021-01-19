@@ -1,0 +1,85 @@
+description: >
+  Steps sequence for Kubernetes deployment.
+  This job assumes that you have previously declared following environment variables:
+  - AZURE_SP
+  - AZURE_SP_PASSWORD
+  - AZURE_SP_TENANT
+
+parameters:
+  service:
+    type: string
+    description: >
+      Application service to deploy in Kubernetes.
+  version:
+    type: string
+    description: >
+      Version of the service to deploy. This corresponds to the tag of the Docker image pulled by Kubernetes.
+  env:
+    type: enum
+    default: "development"
+    enum: [ "development", "staging", "production" ]
+    description: >
+      Running environment.
+  cluster_name:
+    type: string
+    description: >
+      Name of the AKS cluster.
+  resource_group:
+    type: string
+    description: >
+      Azure resource group including the AKS cluster.
+  repository:
+    type: string
+    description: >
+      Repository hosting Helm configurations.
+  helm_client_version:
+    type: string
+    default: "v2.17.0"
+    description: >
+      Version of Helm client to use for Kubernetes deployments.
+  git_email:
+    type: env_var_name
+    default: "GIT_USER_EMAIL"
+    description: >
+      Name of the environment variable for the email of
+      Git user used to push the new tag.
+  git_user:
+    type: env_var_name
+    default: "GIT_USER_NAME"
+    description: >
+      Name of the environment variable for the user name of
+      Git user used to push the new tag.
+
+steps:
+  - run:
+      name: Clone Deployment repository
+      command: git clone git@github.com:cospirit/<< parameters.repository >> deployment
+  - run:
+      name: Update service configuration to version << parameters.version >>
+      working_directory: deployment/clusters/<< parameters.env >>
+      # TODO use script and write unit test when inline command works
+      # environment:
+      #   VERSION: << parameters.version >>
+      #   K8S_CONF_FILE: values.services.<< parameters.service >>.yaml
+      # command: << include(scripts/k8s_service_version.sh)
+      command: |
+        sed -i '0,/version:.*$/ s/version:.*$/version: \"'<< parameters.version >>'\"/' values.services.<< parameters.service >>.yaml
+        head -n 3 values.services.<< parameters.service >>.yaml
+  - helm/install-helm-client:
+      version: << parameters.helm_client_version >>
+  - azure-aks/update-kubeconfig-with-credentials:
+      cluster-name: << parameters.cluster_name >>
+      install-kubectl: true
+      perform-login: true
+      resource-group: << parameters.resource_group >>
+  - run:
+      name: Deploy to << parameters.env >> cluster
+      working_directory: deployment/clusters/<< parameters.env >>
+      command: FORCE=1 make deploy.services.<< parameters.service >>
+  - run:
+      name: Commit and push service configuration file
+      working_directory: deployment
+      environment:
+        COMMIT_MSG: "k8s: update << parameters.service >> service version to << parameters.version >>"
+        COMMIT_FILE: clusters/<< parameters.env >>/values.services.<< parameters.service >>.yaml
+      command: << include(scripts/git_push.sh) >>

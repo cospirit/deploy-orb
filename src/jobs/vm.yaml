@@ -136,4 +136,3 @@ steps:
             version_file: << parameters.version_file >>
             git_email: <<parameters.git_email >>
             git_user: << parameters.git_user >>
-

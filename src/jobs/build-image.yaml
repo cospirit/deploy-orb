@@ -2,6 +2,10 @@ description: >
   Build Docker image depending on running environment.
   Dev env will only build Docker image.
   In staging and production environments, the built image is also pushed on ACR registry.
+  This job assumes that you have previously declared following environment variables:
+  - AZURE_SP
+  - AZURE_SP_PASSWORD
+  - AZURE_SP_TENANT
 
 executor: default
 
@@ -55,69 +59,22 @@ parameters:
     default: ""
     description: >
       ACR registry hosting Docker images.
+  persist_tag:
+    type: boolean
+    default: true
+    description: >
+      Persist the image tag of the service to be able to use it in following jobs.
+      The tag will be persisted in ~/release/docker-image-tag.txt.
 
 steps:
-  - checkout
-  # build image for dev environment
-  - when:
-      condition:
-        equal: [ dev, << parameters.env >> ]
-      steps:
-        - run:
-            name: Get service version
-            command: echo "export VERSION=$(cat << parameters.version_file >>)" >> $BASH_ENV
-        - docker/build:
-            dockerfile: << parameters.dockerfile >>
-            extra_build_args: << parameters.extra_build_args >>
-            image: << parameters.service >>
-            lint-dockerfile: true
-            step-name: Build Docker image
-            tag: ${VERSION}
-  # build image for staging / prod environments
-  - when:
-      condition:
-        or:
-          - equal: [ staging, << parameters.env >> ]
-          - equal: [ production, << parameters.env >> ]
-      steps:
-        # production: set env vars
-        - when:
-            condition:
-              equal: [ production, << parameters.env >> ]
-            steps:
-              - run:
-                  name: Set version env vars for << parameters.env >>
-                  command: |
-                    echo "export VERSION=$(cat << parameters.version_file >>)" >> $BASH_ENV
-                    echo "export TAG=${VERSION}" >> $BASH_ENV
-        # staging: set env vars
-        - when:
-            condition:
-              equal: [ staging, << parameters.env >> ]
-            steps:
-              - run:
-                  name: Set version env vars for << parameters.env >>
-                  command: |
-                    echo "export VERSION=$(echo "${CIRCLE_BRANCH}" | sed -E "s/<< parameters.pattern >>/\\1/")" >> "$BASH_ENV"
-                    # echo "export VERSION=$(echo $CIRCLE_BRANCH | sed -E \"s//\1/\")" >> $BASH_ENV
-                    echo "export TAG=${VERSION}-build.$CIRCLE_BUILD_NUM" >> $BASH_ENV
-        - azure-acr/build-and-push-image:
-            login-server-name: << parameters.registry_name >>.azurecr.io
-            registry-name: << parameters.registry_name >>
-            repo: << parameters.service >>
-            dockerfile: << parameters.dockerfile >>
-            extra-build-args: << parameters.extra_build_args >>
-            tag: ${TAG}
-        - when:
-            condition:
-              equal: [ staging, << parameters.env >> ]
-            steps:
-              # This need to be in config of the project
-              # - run:
-              #     name: Save image tag in file
-              #     command: echo "${TAG}" > docker-tag.txt
-              - update-version:
-                  pattern: << parameters.pattern >>
-                  version_file: << parameters.version_file >>
-                  git_email: <<parameters.git_email >>
-                  git_user: << parameters.git_user >>
+  - build-image:
+      service: << parameters.service >>
+      env: << parameters.env >>
+      version_file: << parameters.version_file >>
+      pattern: << parameters.pattern >>
+      git_email: << parameters.git_email >>
+      git_user: << parameters.git_user >>
+      dockerfile: << parameters.dockerfile >>
+      extra_build_args: << parameters.extra_build_args >>
+      registry_name: << parameters.registry_name >>
+      persist_tag: <<parameters.persist_tag >>
