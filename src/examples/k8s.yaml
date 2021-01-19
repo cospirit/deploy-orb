@@ -19,6 +19,7 @@ workflows:
   version: 2
   workflow:
     jobs:
+      # Development jobs
       - deploy/build-image:
           service: my-awesome-app
           persist_tag: false
@@ -30,6 +31,7 @@ workflows:
                 - master
                 - /release\/v?([0-9]+\.?){1,3}/
                 - /hotfix\/.*/
+      # Staging jobs
       - deploy/build-image:
           context: my-staging-context
           service: my-awesome-app
@@ -40,6 +42,15 @@ workflows:
             branches:
               only:
                 - /release\/v?([0-9]+\.?){1,3}/
+      - deploy/k8s:
+          context: my-staging-context
+          service: my-awesome-app
+          env: staging
+          cluster_name: k8s-staging-cluster
+          resource_group: k8s-staging-cluster_resourceGroup
+          repository: deployment
+          requires: [ build-image-staging ]
+      # Production jobs
       - deploy/build-image:
           context: my-production-context
           service: my-awesome-app
@@ -52,14 +63,6 @@ workflows:
       - wait-for-approval:
           type: approval
           requires: [ build-image-prod ]
-      - deploy/k8s:
-          context: my-staging-context
-          service: my-awesome-app
-          env: staging
-          cluster_name: k8s-staging-cluster
-          resource_group: k8s-staging-cluster_resourceGroup
-          repository: deployment
-          requires: [ build-image-staging ]
       - deploy/k8s:
           context: my-production-context
           service: my-awesome-app
