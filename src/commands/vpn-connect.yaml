@@ -49,7 +49,7 @@ steps:
   - run:
       name: Setup VPN
       background: true
-      command: << include(scripts/connect_vpn.sh) >>
+      command: << include(scripts/vpn_connect.sh) >>
   - run:
       name: Wait for the connection to be established
       command: sleep << parameters.vpn_connection_waiting_time >>

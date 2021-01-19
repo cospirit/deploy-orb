@@ -3,8 +3,8 @@ setup() {
     # they will override each together.
     # So it's important that the tested one was sourced last.
     source ./src/scripts/check_ip.sh
-    source ./src/scripts/connect_vpn.sh
-    source ./src/scripts/disconnect_vpn.sh
+    source ./src/scripts/vpn_connect.sh
+    source ./src/scripts/vpn_disconnect.sh
 
     export SUDO=""
     export VPN_CLIENT_CONFIG=$(echo "My decoded OpenVPN configuration file content." | base64)

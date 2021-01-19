@@ -108,7 +108,7 @@ steps:
   - when:
       condition: << parameters.use_vpn >>
       steps:
-        - connect-vpn:
+        - vpn-connect:
             vpn_config: << parameters.vpn_config >>
             vpn_username: << parameters.vpn_username >>
             vpn_password: << parameters.vpn_password >>
@@ -125,7 +125,7 @@ steps:
   - when:
       condition: << parameters.use_vpn >>
       steps:
-        - disconnect-vpn
+        - vpn-disconnect
   - when:
       condition:
         and:

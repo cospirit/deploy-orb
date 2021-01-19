@@ -1,5 +1,5 @@
 description: >
-  Create a GitHub tag from VERSION file.
+  Create a Git tag from VERSION file.
   VERSION file must be at root directory and up to date.
 
 parameters:
