@@ -23,7 +23,7 @@ endif
 	:
 
 development@install: development@docker.build development@orb.pack
-development@build: development@orb.validate development@orb.pack development@cs.lint development@test
+development@build: development@orb.pack development@orb.validate development@cs.lint development@test
 development@test: development@test.bats
 
 development@docker.build:
