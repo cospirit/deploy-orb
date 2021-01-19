@@ -1,0 +1,95 @@
+description: >
+  Steps sequence for Kubernetes deployment.
+  This job assumes that you have previously declared following environment variables:
+  - AZURE_SP
+  - AZURE_SP_PASSWORD
+  - AZURE_SP_TENANT
+
+executor: default
+
+parameters:
+  service:
+    type: string
+    description: >
+      Application service to deploy in Kubernetes.
+  env:
+    type: enum
+    default: "development"
+    enum: [ "development", "staging", "production" ]
+    description: >
+      Running environment.
+  cluster_name:
+    type: string
+    description: >
+      Name of the AKS cluster.
+  resource_group:
+    type: string
+    default: ""
+    description: >
+      Azure resource group including the AKS cluster.
+  attach_tag:
+    type: boolean
+    default: true
+    description: >
+      Attach the tag of the image persisted with build-image command.
+      This can be used to know which tag of a Docker image to deploy.
+      The tag is stored in ~/release/docker-image-tag.txt.
+  version_file:
+    type: string
+    default: "~/release/docker-image-tag.txt"
+    description: >
+      Name of the file that handles the current service version number.
+  repository:
+    type: string
+    description: >
+      Repository hosting Helm configurations.
+  create_git_tag:
+    type: boolean
+    default: false
+    description: >
+      Whether to create git tag after successful production deployments.
+      The value of the tag is get from VERSION file content.
+  helm_client_version:
+    type: string
+    default: "v2.17.0"
+    description: >
+      Version of Helm client to use for Kubernetes deployments.
+  git_email:
+    type: env_var_name
+    default: "GIT_USER_EMAIL"
+    description: >
+      Name of the environment variable for the email of
+      Git user used to push the new tag.
+  git_user:
+    type: env_var_name
+    default: "GIT_USER_NAME"
+    description: >
+      Name of the environment variable for the user name of
+      Git user used to push the new tag.
+
+steps:
+  - when:
+      condition: << parameters.attach_tag >>
+      steps:
+        - attach_workspace:
+            at: ~/release
+  - run:
+      name: Get service version to deploy
+      command: echo "export TAG=$(cat << parameters.version_file >>)" >> $BASH_ENV
+  - k8s:
+      service: << parameters.service >>
+      version: ${TAG}
+      env: << parameters.env >>
+      cluster_name: << parameters.cluster_name >>
+      resource_group: << parameters.resource_group >>
+      repository: << parameters.repository >>
+      helm_client_version: << parameters.helm_client_version >>
+      git_email: << parameters.git_email >>
+      git_user: << parameters.git_user >>
+  - when:
+      condition: << parameters.create_git_tag >>
+      steps:
+        - git-tag:
+            version_file: << parameters.version_file >>
+            git_email: << parameters.git_email >>
+            git_user: << parameters.git_user >>

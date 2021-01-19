@@ -26,8 +26,8 @@ jobs:
   integration-test-1:
     executor: deploy/default
     steps:
-      - deploy/connect-vpn
-      - deploy/disconnect-vpn
+      - deploy/vpn-connect
+      - deploy/vpn-disconnect
 
 workflows:
   # Prior to producing a development orb (which requires credentials) basic validation, linting, and even unit testing can be performed.
@@ -93,7 +93,7 @@ workflows:
           context: orb-publishing
           add-pr-comment: false
           fail-if-semver-not-indicated: true
-          publish-version-tag: false
+          publish-version-tag: true
           requires:
             - integration-test-1
             # - integration-test-2

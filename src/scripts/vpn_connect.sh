@@ -16,9 +16,7 @@ get_ip() {
 
 ovpn_config() {
     printf "%s\n%s" "${VPN_USERNAME}" "${VPN_PASSWORD}" > /tmp/vpn.login
-    cat /tmp/vpn.login
     echo "${VPN_CLIENT_CONFIG}" | base64 -d > /tmp/config.ovpn
-    cat /tmp/config.ovpn
 }
 
 ovpn_connect() {
@@ -36,7 +34,6 @@ connect() {
 }
 
 # Will not run if sourced for bats-core tests.
-# View src/tests for more information.
 ORB_TEST_ENV="bats-core"
 if [ "${0#*$ORB_TEST_ENV}" == "$0" ]; then
     connect

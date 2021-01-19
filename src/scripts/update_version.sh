@@ -16,7 +16,6 @@ update_version() {
 }
 
 # Will not run if sourced for bats-core tests.
-# View src/tests for more information.
 if [ "${0#*$ORB_TEST_ENV}" == "$0" ]; then
     update_version
 fi

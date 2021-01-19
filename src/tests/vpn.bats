@@ -3,14 +3,14 @@ setup() {
     # they will override each together.
     # So it's important that the tested one was sourced last.
     source ./src/scripts/check_ip.sh
-    source ./src/scripts/connect_vpn.sh
-    source ./src/scripts/disconnect_vpn.sh
+    source ./src/scripts/vpn_connect.sh
+    source ./src/scripts/vpn_disconnect.sh
 
     export SUDO=""
     export VPN_CLIENT_CONFIG=$(echo "My decoded OpenVPN configuration file content." | base64)
 }
 
-@test '1: OpenVPN configuration files creation success' {
+@test '> OpenVPN configuration files creation success' {
     export VPN_USERNAME=john.doe@email.com
     export VPN_PASSWORD=P4s\$worD
     vpn_client_config_encoded=TXkgZGVjb2RlZCBPcGVuVlBOIGNvbmZpZ3VyYXRpb24gZmlsZSBjb250ZW50Lgo=
@@ -24,7 +24,7 @@ setup() {
     [ "$vpn_client_login_file" == "$(cat /tmp/vpn.login)" ]
 }
 
-@test '2: Fail if OpenVPN is not installed' {
+@test '> Fail if OpenVPN is not installed' {
     run requirements
 
     [ "$status" -eq 1 ]

@@ -11,7 +11,7 @@ teardown() {
     if [[ -f "${FILE}" ]]; then rm "${FILE}"; fi
 }
 
-@test '1: VERSION file update succeed' {
+@test '> VERSION file update succeed' {
     # Mock environment variables or functions by exporting them (after the script has been sourced)
     export CIRCLE_BRANCH="release/v1.1"
     export VERSION=$(echo "${CIRCLE_BRANCH}" | sed -E "s/${BRANCH_PATTERN}/\\1/")
@@ -20,7 +20,7 @@ teardown() {
     [ "$result" == "1.1" ]
 }
 
-@test '2: VERSION file is up to date' {
+@test '> VERSION file is up to date' {
     # Mock environment variables or functions by exporting them (after the script has been sourced)
     export CIRCLE_BRANCH="release/v1.0"
     export VERSION=$(echo "${CIRCLE_BRANCH}" | sed -E "s/${BRANCH_PATTERN}/\\1/")

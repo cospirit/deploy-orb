@@ -7,7 +7,7 @@ display:
   source_url: "https://www.github.com/cospirit/deploy-orb"
 
 orbs:
-  docker: circleci/docker@1.5.0
-  azure-acr: circleci/azure-acr@0.2.0
-  azure-aks: circleci/azure-aks@0.2.1
-  helm: circleci/helm@1.2.0
+  docker: circleci/docker@1.5
+  azure-acr: circleci/azure-acr@0.2
+  azure-aks: circleci/azure-aks@0.2
+  helm: circleci/helm@1.2
