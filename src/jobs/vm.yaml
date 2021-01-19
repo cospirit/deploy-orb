@@ -23,7 +23,7 @@ parameters:
     type: string
     description: >
       Fingerprint of the SSH key use to deploy on servers.
-  deploy_mode:
+  deploy_tool:
     type: enum
     default: "deployer"
     enum: [ "ansible", "deployer" ]
@@ -95,7 +95,7 @@ steps:
       command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
   - when:
       condition:
-        equal: [ ansible, << parameters.deploy_mode >> ]
+        equal: [ ansible, << parameters.deploy_tool >> ]
       steps:
         - run:
             name: Install Ansible
@@ -104,7 +104,7 @@ steps:
               pip install ansible
   - when:
       condition:
-        equal: [ deployer, << parameters.deploy_mode >> ]
+        equal: [ deployer, << parameters.deploy_tool >> ]
       steps:
         - run:
             name: Install Docker Compose
@@ -141,7 +141,7 @@ steps:
       condition:
         and:
           - equal: [ staging, << parameters.env >>]
-          - equal: [ ansible, << parameters.deploy_mode >> ]
+          - equal: [ ansible, << parameters.deploy_tool >> ]
       steps:
         - run:
             name: Update version in service configuration
