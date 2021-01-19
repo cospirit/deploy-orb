@@ -1,10 +1,10 @@
 .SILENT:
 
-IMAGE=cospirit/deploy:latest
-DOCKER_CMD=docker run --rm -it -v $(shell pwd):/orb $(IMAGE)
-BATS_CMD=$(DOCKER_CMD) bats --jobs $(BATS_JOBS)
+IMAGE=cospirit/deploy
+DOCKER_CMD=docker run --rm -it -v $(shell pwd):/orb
+BATS_CMD=$(DOCKER_CMD) $(IMAGE) bats --jobs $(BATS_JOBS)
 BATS_JOBS=5
-CIRCLECI_CMD=$(DOCKER_CMD) circleci --skip-update-check
+CIRCLECI_CMD=$(DOCKER_CMD) $(IMAGE) circleci --skip-update-check
 
 # 1. filter main receipe name from args (https://stackoverflow.com/a/47008498)
 # 2. exclude 'development@install' in remaining args for receipe chaining
@@ -23,17 +23,34 @@ endif
 	:
 
 development@install: development@docker.build development@orb.pack
+development@build: development@orb.validate development@orb.pack development@cs.lint development@test
 development@test: development@test.bats
 
 development@docker.build:
 	docker build -t $(IMAGE) docker/
+
+development@cs.lint:
+	docker run --rm -it\
+		-v $(shell pwd):/src/deployment \
+		-w /src/deployment \
+		singapore/lint-condo \
+		yamllint src
+
+	docker run --rm -it \
+		-v $(shell pwd):/src \
+		-w /src \
+		koalaman/shellcheck-alpine:v0.7.1 \
+		shellcheck \
+			--exclude=SC2148 \
+			--severity=style \
+			--format=tty \
+			./src/scripts/*.sh
 
 development@test.bats:
 	 $(BATS_CMD) src/tests/ #$(call args,'src/tests/')
 
 development@orb.validate:
 	$(CIRCLECI_CMD) orb validate src/@orb.yml
-	docker run --rm -it -v $(shell pwd):/src/deployment -w /src/deployment singapore/lint-condo yamllint src
 
 development@orb.pack:
 	$(CIRCLECI_CMD) orb pack src/
