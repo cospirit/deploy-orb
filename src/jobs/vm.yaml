@@ -23,6 +23,12 @@ parameters:
     type: string
     description: >
       Fingerprint of the SSH key use to deploy on servers.
+  deploy_mode:
+    type: enum
+    default: "deployer"
+    enum: [ "ansible", "deployer" ]
+    description: >
+      Define the tool / framework to use to deploy the service.
   use_vpn:
     type: boolean
     default: true
@@ -85,15 +91,27 @@ parameters:
 
 steps:
   - run:
-      name: System setup
-      command: |
-        echo "Add GitHub SSH config"
-        echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
-
-        echo "Install Docker Compose"
-        curl -L https://github.com/docker/compose/releases/download/<< parameters.docker_compose_version >>/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
-        chmod +x ~/docker-compose
-        sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      name: Add GitHub SSH config
+      command: echo -e "Host github.com\n\tStrictHostKeyChecking no\n" >> ~/.ssh/config
+  - when:
+      condition:
+        equal: [ ansible, << parameters.deploy_mode >> ]
+      steps:
+        - run:
+            name: Install Ansible
+            command: |
+              pip install --upgrade pip
+              pip install ansible
+  - when:
+      condition:
+        equal: [ deployer, << parameters.deploy_mode >> ]
+      steps:
+        - run:
+            name: Install Docker Compose
+            command: |
+              curl -L https://github.com/docker/compose/releases/download/<< parameters.docker_compose_version >>/docker-compose-`uname -s`-`uname -m` > ~/docker-compose
+              chmod +x ~/docker-compose
+              sudo mv ~/docker-compose /usr/local/bin/docker-compose
   - when:
       condition:
         or:
@@ -118,10 +136,28 @@ steps:
         - "<< parameters.deploy_key >>"
   - run:
       name: Deploy service << parameters.service >>
-      command: |
-        git clone git@github.com:cospirit/<< parameters.repository >>.git -b feature/devops/update-vcs deployment
-        cd deployment
-        make << parameters.env >>@deploy.<< parameters.service >>
+      command: git clone git@github.com:cospirit/<< parameters.repository >>.git deployment
+  - when:
+      condition:
+        and:
+          - equal: [ staging, << parameters.env >>]
+          - equal: [ ansible, << parameters.deploy_mode >> ]
+      steps:
+        - run:
+            name: Update version in service configuration
+            working_directory: deployment/ansible/gesco/hosts/host_vars
+            command: |
+              if [ "$(cat << parameters.service >>_<< parameters.env >>.yml | grep -oE '<< parameters.pattern >>')" != "$CIRCLE_BRANCH" ]; then
+                RELEASE_BRANCH=$(echo $CIRCLE_BRANCH | sed -E 's:\/:\\/:g')
+                sed -i '/git_branch:/ s/:.*/: '$RELEASE_BRANCH'/' << parameters.service >>_<< parameters.env >>.yml
+                head -n 11 << parameters.service >>_<< parameters.env >>.yml
+              else
+                echo "Branch is already set to $CIRCLE_BRANCH"
+              fi
+  - run:
+      name: Deploy service << parameters.service >>
+      working_dir: deployment
+      command: make << parameters.env >>@deploy.<< parameters.service >>
   - when:
       condition: << parameters.use_vpn >>
       steps:
