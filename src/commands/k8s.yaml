@@ -60,7 +60,7 @@ steps:
       # TODO use script and write unit test when inline command works
       # environment:
       #   VERSION: << parameters.version >>
-      #   K8S_CONF_FILE: values.services.<< parameters.service >>.yaml
+      #   SERVICE_CONF_FILE: values.services.<< parameters.service >>.yaml
       # command: << include(scripts/k8s_service_version.sh)
       command: |
         sed -i '0,/version:.*$/ s/version:.*$/version: \"'<< parameters.version >>'\"/' values.services.<< parameters.service >>.yaml
