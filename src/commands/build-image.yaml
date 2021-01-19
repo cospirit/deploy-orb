@@ -65,7 +65,6 @@ parameters:
       The tag will be persisted in ~/release/docker-image-tag.txt.
 
 steps:
-  - checkout
   # build image for dev environment
   - when:
       condition:
@@ -74,8 +73,9 @@ steps:
         - run:
             name: Get service version
             command: |
-              echo "export VERSION=$(cat << parameters.version_file >>)" >> $BASH_ENV
-              echo "export TAG=${VERSION}" >> $BASH_ENV
+              version="$(cat << parameters.version_file >>)"
+              echo "export VERSION=$version" >> $BASH_ENV
+              echo "export TAG=$version" >> $BASH_ENV
         - docker/build:
             dockerfile: << parameters.dockerfile >>
             extra_build_args: << parameters.extra_build_args >>
@@ -98,8 +98,9 @@ steps:
               - run:
                   name: Set version env vars for << parameters.env >>
                   command: |
-                    echo "export VERSION=$(cat << parameters.version_file >>)" >> $BASH_ENV
-                    echo "export TAG=${VERSION}" >> $BASH_ENV
+                    version="$(cat << parameters.version_file >>)"
+                    echo "export VERSION=$version" >> $BASH_ENV
+                    echo "export TAG=$version" >> $BASH_ENV
         # staging: set env vars
         - when:
             condition:
@@ -108,9 +109,9 @@ steps:
               - run:
                   name: Set version env vars for << parameters.env >>
                   command: |
-                    echo "export VERSION=$(echo "${CIRCLE_BRANCH}" | sed -E "s/<< parameters.pattern >>/\\1/")" >> "$BASH_ENV"
-                    # echo "export VERSION=$(echo $CIRCLE_BRANCH | sed -E \"s//\1/\")" >> $BASH_ENV
-                    echo "export TAG=${VERSION}-build.$CIRCLE_BUILD_NUM" >> $BASH_ENV
+                    version=$(echo "${CIRCLE_BRANCH}" | sed -E "s/<< parameters.pattern >>/\\1/")
+                    echo "export VERSION=$version" >> "$BASH_ENV"
+                    echo "export TAG=$version-build.$CIRCLE_BUILD_NUM" >> $BASH_ENV
         - azure-acr/build-and-push-image:
             login-server-name: << parameters.registry_name >>.azurecr.io
             registry-name: << parameters.registry_name >>

@@ -67,6 +67,7 @@ parameters:
       The tag will be persisted in ~/release/docker-image-tag.txt.
 
 steps:
+  - checkout
   - build-image:
       service: << parameters.service >>
       env: << parameters.env >>
