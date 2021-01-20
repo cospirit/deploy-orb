@@ -11,7 +11,7 @@ update_version() {
         fi
         cat "${FILE}"
     else
-      echo "${FILE} file already up to date"
+      echo "${FILE} file is already up to date"
     fi
 }
 

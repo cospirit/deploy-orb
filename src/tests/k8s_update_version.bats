@@ -11,7 +11,7 @@ teardown() {
     if [[ -f "${SERVICE_CONF_FILE}" ]]; then rm "${SERVICE_CONF_FILE}"; fi
 }
 
-@test '> K8s service version update succeed' {
+@test 'K8s: Update service version in Helm values succeed' {
     export VERSION="1.1"
 
     run update_service_version
@@ -23,7 +23,7 @@ teardown() {
     [ "$sidecar_version" == 'version: "2.0.1"' ]
 }
 
-@test '> K8s service configuration file update succeed' {
+@test 'K8s: Update service Helm values file succeed' {
     export VERSION="1.1"
 
     run update_service_configuration

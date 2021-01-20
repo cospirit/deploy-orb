@@ -1,5 +1,5 @@
 setup_file() {
-    export FILE="${BATS_TMPDIR}/VERSION"
+    export FILE="${BATS_TMPDIR}/$(cat /proc/sys/kernel/random/uuid)"
     cp "./src/tests/fixtures/VERSION" "${FILE}"
 }
 
@@ -16,14 +16,14 @@ teardown_file() {
     rm -rf "${FILE}"
 }
 
-@test '> Docker build: Env vars for development environment' {
+@test 'Docker build: Env vars for development environment' {
     set_devlopment_vars
 
     grep -e "VERSION=\"$(cat "${FILE}")\"" $BASH_ENV
     grep -e "TAG=\"$(cat "${FILE}")\"" $BASH_ENV
 }
 
-@test '> Docker build: Env vars for staging environment' {
+@test 'Docker build: Env vars for staging environment' {
 	export VERSION="$(cat "${FILE}")"
 	export CIRCLE_BUILD_NUM=1
 	export CIRCLE_BRANCH="release/v${VERSION}"
@@ -35,14 +35,14 @@ teardown_file() {
     grep -e "TAG=\"${VERSION}-build.1\"" $BASH_ENV
 }
 
-@test '> Docker build: Env vars for production environment' {
+@test 'Docker build: Env vars for production environment' {
     set_production_vars
 
     grep -e "VERSION=\"$(cat "${FILE}")\"" $BASH_ENV
     grep -e "TAG=\"$(cat "${FILE}")\"" $BASH_ENV
 }
 
-@test '> Docker build: Run for given env' {
+@test 'Docker build: Run for given env' {
 	environments="development staging production"
 
 	for "$env" in "$environments"; do
@@ -59,7 +59,7 @@ teardown_file() {
     [ "$output" == "Unknown environment ${ENV}" ]
 }
 
-@test '> Docker build: Throws exception on unknown environment' {
+@test 'Docker build: Throws exception on unknown environment' {
 	export ENV=wrong_env
 
     run throw_unknown_env
