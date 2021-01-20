@@ -168,6 +168,11 @@ steps:
           - << parameters.create_git_tag >>
           - equal: [ prod, << parameters.env >> ]
       steps:
+        - run:
+            name: Move to fresh directory
+            command: |
+              mkdir "~/$CIRCLE_PROJECT_REPONAME"
+              cd "~/$CIRCLE_PROJECT_REPONAME"
         - git-tag:
             version_file: << parameters.version_file >>
             git_email: <<parameters.git_email >>

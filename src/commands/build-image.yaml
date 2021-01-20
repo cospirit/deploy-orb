@@ -41,6 +41,11 @@ parameters:
     description: >
       Name of the environment variable for the user name of
       Git user used to push the new tag.
+  lint-dockerfile:
+    type: boolean
+    default: true
+    description: >
+      Whether to lint Dockerfile before building.
   dockerfile:
     type: string
     default: "docker/code/Dockerfile"
@@ -63,8 +68,17 @@ parameters:
     description: >
       Persist the tag of the Docker image to be able to use it in following jobs.
       The tag will be persisted in ~/release/docker-image-tag.txt.
+  checkout:
+    type: boolean
+    default: true
+    description: >
+      Whether to perform the CircleCI checkout step.
 
 steps:
+  - when:
+      condition: << parameters.checkout >>
+      steps:
+        - checkout
   # build image for dev environment
   - when:
       condition:
@@ -80,7 +94,7 @@ steps:
             dockerfile: << parameters.dockerfile >>
             extra_build_args: << parameters.extra_build_args >>
             image: << parameters.service >>
-            lint-dockerfile: true
+            lint-dockerfile: << parameters.lint-dockerfile >>
             step-name: Build Docker image for production
             tag: ${TAG}
   # build image for staging / prod environments
@@ -113,6 +127,8 @@ steps:
                     echo "export VERSION=$version" >> "$BASH_ENV"
                     echo "export TAG=$version-build.$CIRCLE_BUILD_NUM" >> $BASH_ENV
         - azure-acr/build-and-push-image:
+            checkout: false
+            lint-dockerfile: << parameters.lint-dockerfile >>
             login-server-name: << parameters.registry_name >>.azurecr.io
             registry-name: << parameters.registry_name >>
             repo: << parameters.service >>

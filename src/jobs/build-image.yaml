@@ -43,6 +43,11 @@ parameters:
     description: >
       Name of the environment variable for the user name of
       Git user used to push the new tag.
+  lint-dockerfile:
+    type: boolean
+    default: true
+    description: >
+      Whether to lint Dockerfile before building.
   dockerfile:
     type: string
     default: "docker/code/Dockerfile"
@@ -65,16 +70,22 @@ parameters:
     description: >
       Persist the image tag of the service to be able to use it in following jobs.
       The tag will be persisted in ~/release/docker-image-tag.txt.
+  checkout:
+    type: boolean
+    default: true
+    description: >
+      Whether to perform the CircleCI checkout step.
 
 steps:
-  - checkout
   - build-image:
+      checkout: << parameters.checkout >>
       service: << parameters.service >>
       env: << parameters.env >>
       version_file: << parameters.version_file >>
       pattern: << parameters.pattern >>
       git_email: << parameters.git_email >>
       git_user: << parameters.git_user >>
+      lint-dockerfile: << parameters.lint-dockerfile >>
       dockerfile: << parameters.dockerfile >>
       extra_build_args: << parameters.extra_build_args >>
       registry_name: << parameters.registry_name >>

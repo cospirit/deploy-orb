@@ -30,8 +30,17 @@ parameters:
     description: >
       Name of the environment variable for the user name of
       Git user used to push the new tag.
+  checkout:
+    type: boolean
+    default: true
+    description: >
+      Whether to perform the CircleCI checkout step.
 
 steps:
+  - when:
+      condition: << parameters.checkout >>
+      steps:
+        - checkout
   - run:
       name: Set env vars
       command: |
