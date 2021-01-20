@@ -44,7 +44,7 @@ parameters:
       Name of the environment variable for the user name of
       Git user used to push the new tag.
   lint-dockerfile:
-    type: bollean
+    type: boolean
     default: true
     description: >
       Whether to lint Dockerfile before building.
