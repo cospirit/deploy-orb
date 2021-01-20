@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
  - Current development changes [ to be moved to release ]
 
+## [v0.2.1] - 2020-01-20
+### Added
+ - Add parameter `checkout` in `git-tag` / `build-image` / `k8s` commands and jobs. This fixes the issue that get git tag creation when not in a git context.
+ - Add parameter `lint-dockerfile` in `build-image` command and job.
+
 ## [v0.2] - 2020-01-20
 ### Added
  - Job: `build-image` builds Docker image depending on running environnement.
@@ -38,5 +43,6 @@ Initial Release
  - Init Orb example files
 
 
-[v0.1.3]: https://circleci.com/developer/orbs/orb/cospirit/deploy?version=0.1.3
+[v0.2.1]: https://github.com/cospirit/deploy-orb/releases/tag/v0.2.1
 [v0.2]: https://github.com/cospirit/deploy-orb/releases/tag/v0.2
+[v0.1.3]: https://circleci.com/developer/orbs/orb/cospirit/deploy?version=0.1.3
