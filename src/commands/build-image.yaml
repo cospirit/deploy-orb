@@ -86,10 +86,9 @@ steps:
       steps:
         - run:
             name: Get service version
-            command: |
-              version="$(cat << parameters.version_file >>)"
-              echo "export VERSION=$version" >> $BASH_ENV
-              echo "export TAG=$version" >> $BASH_ENV
+            environment:
+              FILE: << parameters.version_file >>
+            command: << include(scripts/prepare_docker_build.sh) >>
         - docker/build:
             dockerfile: << parameters.dockerfile >>
             extra_build_args: << parameters.extra_build_args >>
@@ -111,10 +110,9 @@ steps:
             steps:
               - run:
                   name: Set version env vars for << parameters.env >>
-                  command: |
-                    version="$(cat << parameters.version_file >>)"
-                    echo "export VERSION=$version" >> $BASH_ENV
-                    echo "export TAG=$version" >> $BASH_ENV
+                  environment:
+                    FILE: << parameters.version_file >>
+                  command: << include(scripts/prepare_docker_build.sh) >>
         # staging: set env vars
         - when:
             condition:
@@ -122,10 +120,10 @@ steps:
             steps:
               - run:
                   name: Set version env vars for << parameters.env >>
-                  command: |
-                    version=$(echo "${CIRCLE_BRANCH}" | sed -E "s/<< parameters.pattern >>/\\1/")
-                    echo "export VERSION=$version" >> "$BASH_ENV"
-                    echo "export TAG=$version-build.$CIRCLE_BUILD_NUM" >> $BASH_ENV
+                  environment:
+                    FILE: << parameters.version_file >>
+                    BRANCH_PATTERN: <<parameters.pattern >>
+                  command: << include(scripts/prepare_docker_build.sh) >>
         - azure-acr/build-and-push-image:
             checkout: false
             lint-dockerfile: << parameters.lint-dockerfile >>
