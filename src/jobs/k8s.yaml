@@ -49,6 +49,11 @@ parameters:
     description: >
       Whether to create git tag after successful production deployments.
       The value of the tag is get from VERSION file content.
+  checkout:
+    type: boolean
+    default: true
+    description: >
+      Whether to perform the CircleCI checkout step for git tag creation.
   helm_client_version:
     type: string
     default: "v2.17.0"
@@ -90,6 +95,7 @@ steps:
       condition: << parameters.create_git_tag >>
       steps:
         - git-tag:
+            checkout: << parameters.checkout >>
             version_file: << parameters.version_file >>
             git_email: << parameters.git_email >>
             git_user: << parameters.git_user >>

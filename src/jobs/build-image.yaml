@@ -65,10 +65,15 @@ parameters:
     description: >
       Persist the image tag of the service to be able to use it in following jobs.
       The tag will be persisted in ~/release/docker-image-tag.txt.
+  checkout:
+    type: boolean
+    default: true
+    description: >
+      Whether to perform the CircleCI checkout step.
 
 steps:
-  - checkout
   - build-image:
+      checkout: << parameters.checkout >>
       service: << parameters.service >>
       env: << parameters.env >>
       version_file: << parameters.version_file >>

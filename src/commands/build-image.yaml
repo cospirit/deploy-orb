@@ -63,8 +63,17 @@ parameters:
     description: >
       Persist the tag of the Docker image to be able to use it in following jobs.
       The tag will be persisted in ~/release/docker-image-tag.txt.
+  checkout:
+    type: boolean
+    default: true
+    description: >
+      Whether to perform the CircleCI checkout step.
 
 steps:
+  - when:
+      condition: << parameters.checkout >>
+      steps:
+        - checkout
   # build image for dev environment
   - when:
       condition:
