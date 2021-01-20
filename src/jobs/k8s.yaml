@@ -95,7 +95,6 @@ steps:
               mkdir "~/$CIRCLE_PROJECT_REPONAME"
               cd "~/$CIRCLE_PROJECT_REPONAME"
         - git-tag:
-            checkout: << parameters.checkout >>
             version_file: << parameters.version_file >>
             git_email: << parameters.git_email >>
             git_user: << parameters.git_user >>

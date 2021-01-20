@@ -57,13 +57,14 @@ steps:
   - run:
       name: Update service configuration to version << parameters.version >>
       working_directory: deployment/clusters/<< parameters.env >>
-      environment:
-        VERSION: << parameters.version >>
-        SERVICE_CONF_FILE: values.services.<< parameters.service >>.yaml
-      command: << include(scripts/k8s_service_version.sh)
-      # command: |
-      #   sed -i '0,/version:.*$/ s/version:.*$/version: \"'<< parameters.version >>'\"/' values.services.<< parameters.service >>.yaml
-      #   head -n 3 values.services.<< parameters.service >>.yaml
+      # TODO make it work with tests
+      # environment:
+      #   VERSION: << parameters.version >>
+      #   SERVICE_CONF_FILE: values.services.<< parameters.service >>.yaml
+      # command: << include(scripts/k8s_service_version.sh) >>
+      command: |
+        sed -i '0,/version:.*$/ s/version:.*$/version: \"'<< parameters.version >>'\"/' values.services.<< parameters.service >>.yaml
+        head -n 3 values.services.<< parameters.service >>.yaml
   - helm/install-helm-client:
       version: << parameters.helm_client_version >>
   - azure-aks/update-kubeconfig-with-credentials:
