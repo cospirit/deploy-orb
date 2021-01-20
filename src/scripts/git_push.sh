@@ -6,8 +6,4 @@ git_push() {
     git push origin "$3"
 }
 
-# Will not run if sourced for bats-core tests.
-ORB_TEST_ENV="bats-core"
-if [ "${0#*$ORB_TEST_ENV}" == "$0" ]; then
-    git_push "${COMMIT_MSG}" "${COMMIT_FILE}" "${COMMIT_BRANCH:-master}"
-fi
+git_push "${COMMIT_MSG}" "${COMMIT_FILE}" "${COMMIT_BRANCH:-master}"
