@@ -12,7 +12,7 @@ setup() {
 
 @test 'VPN: OpenVPN configuration files creation success' {
     export VPN_USERNAME=john.doe@email.com
-    export VPN_PASSWORD=P4s\$worD
+    export VPN_PASSWORD='P4s$worD'
     vpn_client_config_encoded=TXkgZGVjb2RlZCBPcGVuVlBOIGNvbmZpZ3VyYXRpb24gZmlsZSBjb250ZW50Lgo=
     vpn_client_login_file=$(printf "%s\n%s" "${VPN_USERNAME}" "${VPN_PASSWORD}")
 

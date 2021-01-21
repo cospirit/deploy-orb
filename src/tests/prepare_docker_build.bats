@@ -1,11 +1,15 @@
+load helpers.sh
+
 setup_file() {
-    export FILE="${BATS_TMPDIR}/$(cat /proc/sys/kernel/random/uuid)"
+    export FILE="${BATS_TMPDIR}/$(uuid)"
     cp "./src/tests/fixtures/VERSION" "${FILE}"
 }
 
 setup() {
     source ./src/scripts/prepare_docker_build.sh
+
     export BASH_ENV="${BATS_TMPDIR}/BASH_ENV"
+    export BRANCH_PATTERN="release\/v?(([0-9]+\.?){1,3}).*"
 }
 
 teardown_file() {
@@ -19,30 +23,29 @@ teardown_file() {
 @test 'Docker build: Env vars for development environment' {
     set_devlopment_vars
 
-    grep -e "VERSION=\"$(cat "${FILE}")\"" $BASH_ENV
-    grep -e "TAG=\"$(cat "${FILE}")\"" $BASH_ENV
+    grep -e "VERSION=\"$(cat "${FILE}")\"" "$BASH_ENV"
+    grep -e "TAG=\"$(cat "${FILE}")\"" "$BASH_ENV"
 }
 
 @test 'Docker build: Env vars for staging environment' {
 	export VERSION="$(cat "${FILE}")"
 	export CIRCLE_BUILD_NUM=1
 	export CIRCLE_BRANCH="release/v${VERSION}"
-	export BRANCH_PATTERN="release\/v?(([0-9]+\.?){1,3}).*"
 
     set_staging_vars
 
-    grep -e "VERSION=\"${VERSION}\"" $BASH_ENV
-    grep -e "TAG=\"${VERSION}-build.1\"" $BASH_ENV
+    grep -e "VERSION=\"${VERSION}\"" "$BASH_ENV"
+    grep -e "TAG=\"${VERSION}-build.1\"" "$BASH_ENV"
 }
 
 @test 'Docker build: Env vars for production environment' {
     set_production_vars
 
-    grep -e "VERSION=\"$(cat "${FILE}")\"" $BASH_ENV
-    grep -e "TAG=\"$(cat "${FILE}")\"" $BASH_ENV
+    grep -e "VERSION=\"$(cat "${FILE}")\"" "$BASH_ENV"
+    grep -e "TAG=\"$(cat "${FILE}")\"" "$BASH_ENV"
 }
 
-@test 'Docker build: Run for given env' {
+@test 'Docker build: Run for all environments' {
 	environments="development staging production"
 
 	for "$env" in "$environments"; do
@@ -59,7 +62,7 @@ teardown_file() {
     [ "$output" == "Unknown environment ${ENV}" ]
 }
 
-@test 'Docker build: Throws exception on unknown environment' {
+@test 'Docker build: Throws an error on unknown environment' {
 	export ENV=wrong_env
 
     run throw_unknown_env

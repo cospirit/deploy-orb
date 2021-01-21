@@ -146,6 +146,10 @@ steps:
         - run:
             name: Update version in service configuration
             working_directory: deployment/ansible/gesco/hosts/host_vars
+            # environment:
+            #   DEPLOY_CONF_FILE: << parameters.service >>_<< parameters.env >>.yml # ex: app_production.yml
+            #   BRANCH_PATTERN: << parameters.pattern >>
+            # command: << include(scripts/ansible_update_branch.sh) >>
             command: |
               if [ "$(cat << parameters.service >>_<< parameters.env >>.yml | grep -oE '<< parameters.pattern >>')" != "$CIRCLE_BRANCH" ]; then
                 RELEASE_BRANCH=$(echo $CIRCLE_BRANCH | sed -E 's:\/:\\/:g')

@@ -1,10 +1,11 @@
+load helpers.sh
+
 setup() {
     source ./src/scripts/k8s_service_version.sh
 
-    fixture="${BATS_TMPDIR}/k8s_service_version.yaml"
-    cp "./src/tests/fixtures/k8s_service_values.yaml" "$fixture"
+    export SERVICE_CONF_FILE="${BATS_TMPDIR}/k8s_service_version.yaml"
 
-    export SERVICE_CONF_FILE="$fixture"
+    cp "./src/tests/fixtures/k8s_service_values.yaml" "${SERVICE_CONF_FILE}"
 }
 
 teardown() {
@@ -16,8 +17,10 @@ teardown() {
 
     run update_service_version
 
-    service_version=${lines[2]#"${lines[2]%%[![:space:]]*}"}
-    sidecar_version=${lines[7]#"${lines[7]%%[![:space:]]*}"}
+    echo "$output" >&3
+
+    service_version=$(trim "${lines[2]}")
+    sidecar_version=$(trim "${lines[7]}")
 
     [ "$service_version" == 'version: "1.1"' ]
     [ "$sidecar_version" == 'version: "2.0.1"' ]
@@ -28,8 +31,8 @@ teardown() {
 
     run update_service_configuration
 
-    service_version=${lines[2]#"${lines[2]%%[![:space:]]*}"}
-    sidecar_version=${lines[7]#"${lines[7]%%[![:space:]]*}"}
+    service_version=$(trim "${lines[2]}")
+    sidecar_version=$(trim "${lines[7]}")
 
     [ -f "${SERVICE_CONF_FILE}" ]
     [ "$service_version" == 'version: "1.1"' ]

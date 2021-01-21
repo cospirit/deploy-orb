@@ -90,7 +90,7 @@ steps:
       condition: << parameters.create_git_tag >>
       steps:
         - run:
-            name: Move to fresh directory
+            name: Move to a new empty directory
             command: |
               mkdir "~/$CIRCLE_PROJECT_REPONAME"
               cd "~/$CIRCLE_PROJECT_REPONAME"
