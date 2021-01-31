@@ -17,8 +17,6 @@ teardown() {
 
     run update_service_version
 
-    echo "$output" >&3
-
     service_version=$(trim "${lines[2]}")
     sidecar_version=$(trim "${lines[7]}")
 
