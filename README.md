@@ -25,6 +25,25 @@ In the _jobs_ key, you will define _integration tests_. These jobs will utilize 
 
 ### Workflows
 
+The default `.circleci/config.yml` file contains the configuration code needed to automatically pack, test, and deploy and changes made to the contents of the orb source in this directory.
+
+## @orb.yml
+
+This is the entry point for our orb "tree", which becomes our `orb.yml` file later.
+
+Within the `@orb.yml` we generally specify 4 configuration keys
+
+**Keys**
+
+1. **version**
+    Specify version 2.1 for orb-compatible configuration `version: 2.1`
+2. **description**
+    Give your orb a description. Shown within the CLI and orb registry
+3. **display**
+    Specify the `home_url` referencing documentation or product URL, and `source_url` linking to the orb's source repository.
+4. **orbs**
+    (optional) Some orbs may depend on other orbs. Import them here.
+
 There are two workflows which automate the pack, test, and publishing process.
 
 **test-pack**
@@ -45,8 +64,10 @@ When running on the `master` branch (after merging to `master`), the workflow wi
 
 ## Resources
 
-[CircleCI Orb Registry Page](https://circleci.com/orbs/registry/orb/cospirit/deploy-orb) - The official registry page of this orb for all versions, executors, commands, and jobs described.
-[CircleCI Orb Docs](https://circleci.com/docs/2.0/orb-intro/#section=configuration) - Docs for using and creating CircleCI Orbs.
+ - [Orb Author Intro](https://circleci.com/docs/2.0/orb-author-intro/#section=configuration)
+ - [Reusable Configuration](https://circleci.com/docs/2.0/reusing-config)
+ - [CircleCI Orb Registry Page](https://circleci.com/orbs/registry/orb/cospirit/deploy-orb) - The official registry page of this orb for all versions, executors, commands, and jobs described.
+ - [CircleCI Orb Docs](https://circleci.com/docs/2.0/orb-intro/#section=configuration) - Docs for using and creating CircleCI Orbs.
 
 ### How to Contribute
 
