@@ -8,7 +8,7 @@ fi
 
 update_service_version() {
     awk \
-        -e 'BEGIN { n=1; FS="\n" } /version:/ { if (n == 1) {n += 1; $0=gensub(/".*"/,"\""'"${VERSION}"'"\"",g); }} {print $0; } ' \
+        'BEGIN { n=1; FS="\n" } /version:/ { if (n == 1) { n += 1; sub(/".*"/,"\""'"${VERSION}"'"\""); }} { print $0; } ' \
         "${SERVICE_CONF_FILE}"
 }
 
