@@ -135,10 +135,9 @@ steps:
       fingerprints:
         - "<< parameters.deploy_key >>"
   - run:
-      name: Deploy service << parameters.service >>
-      command: |
-        git clone git@github.com:cospirit/<< parameters.repository >>.git deployment
-        cd deployment
+      name: Clone << parameters.repository >> repository
+      working_directory: ~
+      command: git clone git@github.com:cospirit/<< parameters.repository >>.git deployment
   - when:
       condition:
         and:
@@ -147,12 +146,14 @@ steps:
       steps:
         - run:
             name: Update version in service configuration
+            working_directory: deployment/ansible/<< parameters.service >>/hosts/host_vars
             environment:
-              DEPLOY_CONF_FILE: ansible/<< parameters.service >>/hosts/host_vars/<< parameters.service >>_<< parameters.env >>.yml # ex: app_production.yml
+              DEPLOY_CONF_FILE: << parameters.service >>_<< parameters.env >>.yml # ex: app_production.yml
               BRANCH_PATTERN: << parameters.pattern >>
             command: << include(scripts/ansible_update_branch.sh) >>
   - run:
       name: Deploy service << parameters.service >>
+      working_directory: deployment
       command: make << parameters.env >>@deploy.<< parameters.service >>
   - when:
       condition: << parameters.use_vpn >>
