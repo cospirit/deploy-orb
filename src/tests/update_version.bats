@@ -3,7 +3,7 @@ load helpers.sh
 setup() {
     source ./src/scripts/update_version.sh
 
-    export BRANCH_PATTERN="release\/v?(([0-9]+\.?){1,3}).*"
+    export BRANCH_PATTERN="release\/v?(([0-9]+\.?){1,3})(\-[a-zA-Z0-9\-\._]*)?"
     export FILE="${BATS_TMPDIR}/$(uuid)"
 
     cp "./src/tests/fixtures/VERSION" "${FILE}"

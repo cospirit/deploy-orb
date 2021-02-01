@@ -9,7 +9,7 @@ setup() {
     source ./src/scripts/prepare_docker_build.sh
 
     export BASH_ENV="${BATS_TMPDIR}/BASH_ENV"
-    export BRANCH_PATTERN="release\/v?(([0-9]+\.?){1,3}).*"
+    export BRANCH_PATTERN="release\/v?(([0-9]+\.?){1,3})(\-[a-zA-Z0-9\-\._]*)?"
 }
 
 teardown_file() {
