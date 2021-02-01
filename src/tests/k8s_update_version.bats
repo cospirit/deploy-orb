@@ -27,10 +27,10 @@ teardown() {
 @test 'K8s: Update service Helm values file succeed' {
     export VERSION="1.1"
 
-    run update_service_configuration
+    run update_service_configuration 10
 
-    service_version=$(trim "${lines[2]}")
-    sidecar_version=$(trim "${lines[7]}")
+    service_version=$(trim "${lines[3]}")
+    sidecar_version=$(trim "${lines[8]}")
 
     [ -f "${SERVICE_CONF_FILE}" ]
     [ "$service_version" == 'version: "1.1"' ]

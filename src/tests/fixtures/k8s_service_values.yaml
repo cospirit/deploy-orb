@@ -1,6 +1,6 @@
 services:
   service:
-    version: "1.0"
+    version: 1.0
     host: service.cospirit.local
     service:
       replicas: 3
