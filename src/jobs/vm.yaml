@@ -10,8 +10,8 @@ parameters:
       Application service to deploy.
   env:
     type: enum
-    default: "prod"
-    enum: [ "staging", "preprod", "prod" ]
+    default: "production"
+    enum: [ "staging", "preprod", "production" ]
     description: >
       Running environment.
   repository:
@@ -162,7 +162,7 @@ steps:
       condition:
         and:
           - << parameters.create_git_tag >>
-          - equal: [ prod, << parameters.env >> ]
+          - equal: [ production, << parameters.env >> ]
       steps:
         - run:
             name: Move to fresh directory
