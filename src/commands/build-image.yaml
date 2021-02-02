@@ -87,6 +87,7 @@ steps:
         - run:
             name: Get service version
             environment:
+              ENV: << parameters.env >>
               FILE: << parameters.version_file >>
             command: << include(scripts/prepare_docker_build.sh) >>
         - docker/build:
@@ -111,6 +112,7 @@ steps:
               - run:
                   name: Set version env vars for << parameters.env >>
                   environment:
+                    ENV: << parameters.env >>
                     FILE: << parameters.version_file >>
                   command: << include(scripts/prepare_docker_build.sh) >>
         # staging: set env vars
@@ -121,6 +123,7 @@ steps:
               - run:
                   name: Set version env vars for << parameters.env >>
                   environment:
+                    ENV: << parameters.env >>
                     FILE: << parameters.version_file >>
                     BRANCH_PATTERN: <<parameters.pattern >>
                   command: << include(scripts/prepare_docker_build.sh) >>
