@@ -1,4 +1,4 @@
-set_devlopment_vars(){
+set_development_vars(){
     version="$(cat "${FILE}")"
     echo "export VERSION=\"$version\"" >> "$BASH_ENV"
     echo "export TAG=\"$version\"" >> "$BASH_ENV"
@@ -27,7 +27,7 @@ throw_unknown_env() {
 
 set_env() {
     case "${ENV}" in
-        development) set_devlopment_vars;;
+        development) set_development_vars;;
         staging) set_staging_vars;;
         production) set_production_vars;;
         *) throw_unknown_env;;

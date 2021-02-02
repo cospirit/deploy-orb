@@ -21,7 +21,7 @@ teardown_file() {
 }
 
 @test 'Docker build: Env vars for development environment' {
-    set_devlopment_vars
+    set_development_vars
 
     grep -e "VERSION=\"$(cat "${FILE}")\"" "$BASH_ENV"
     grep -e "TAG=\"$(cat "${FILE}")\"" "$BASH_ENV"
