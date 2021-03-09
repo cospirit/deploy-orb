@@ -28,9 +28,9 @@ teardown_file() {
 }
 
 @test 'Docker build: Env vars for staging environment' {
-	export VERSION="$(cat "${FILE}")"
-	export CIRCLE_BUILD_NUM=1
-	export CIRCLE_BRANCH="release/v${VERSION}"
+    export VERSION="$(cat "${FILE}")"
+    export CIRCLE_BUILD_NUM=1
+    export CIRCLE_BRANCH="release/v${VERSION}"
 
     set_staging_vars
 
@@ -46,24 +46,24 @@ teardown_file() {
 }
 
 @test 'Docker build: Run for all environments' {
-	environments="development staging production"
-
-	for "$env" in "$environments"; do
-		export ENV="$env"
-	    run set_env
-
-	    [ "$status" -eq 0 ]
-	done
-	
-	export ENV=wrong_env
+    environments="development staging production"
+    
+    for "$env" in "$environments"; do
+        export ENV="$env"
+        run set_env
+        
+        [ "$status" -eq 0 ]
+    done
+    
+    export ENV=wrong_env
     run set_env
-
+    
     [ "$status" -eq 1 ]
     [ "$output" == "Unknown environment ${ENV}" ]
 }
 
 @test 'Docker build: Throws an error on unknown environment' {
-	export ENV=wrong_env
+    export ENV=wrong_env
 
     run throw_unknown_env
 

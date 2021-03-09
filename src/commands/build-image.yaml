@@ -88,7 +88,7 @@ steps:
             name: Get service version
             environment:
               ENV: << parameters.env >>
-              FILE: << parameters.version_file >>
+              FILE: "<< parameters.version_file >>"
             command: << include(scripts/prepare_docker_build.sh) >>
         - docker/build:
             dockerfile: << parameters.dockerfile >>
@@ -113,7 +113,7 @@ steps:
                   name: Set version env vars for << parameters.env >>
                   environment:
                     ENV: << parameters.env >>
-                    FILE: << parameters.version_file >>
+                    FILE: "<< parameters.version_file >>"
                   command: << include(scripts/prepare_docker_build.sh) >>
         # staging: set env vars
         - when:
@@ -124,7 +124,7 @@ steps:
                   name: Set version env vars for << parameters.env >>
                   environment:
                     ENV: << parameters.env >>
-                    FILE: << parameters.version_file >>
+                    FILE: "<< parameters.version_file >>"
                     BRANCH_PATTERN: <<parameters.pattern >>
                   command: << include(scripts/prepare_docker_build.sh) >>
         - azure-acr/build-and-push-image:

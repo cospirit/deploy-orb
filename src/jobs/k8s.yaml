@@ -73,12 +73,16 @@ steps:
       steps:
         - attach_workspace:
             at: ~/release
+  # Export service version from file into VERSION env var.
+  # This env var is used in k8s command and is the default value
+  # of the 'version' parameter of the command.
   - run:
       name: Get service version to deploy
-      command: echo "export TAG=$(cat << parameters.version_file >>)" >> $BASH_ENV
+      command: |
+        echo "export VERSION=$(cat << parameters.version_file >>)" >> "$BASH_ENV"
+        source "$BASH_ENV"
   - k8s:
       service: << parameters.service >>
-      version: ${TAG}
       env: << parameters.env >>
       cluster_name: << parameters.cluster_name >>
       resource_group: << parameters.resource_group >>
@@ -92,7 +96,7 @@ steps:
         - run:
             name: Move to a new empty directory
             command: |
-              mkdir "~/$CIRCLE_PROJECT_REPONAME"
+              mkdir -p "~/$CIRCLE_PROJECT_REPONAME"
               cd "~/$CIRCLE_PROJECT_REPONAME"
         - git-tag:
             version_file: << parameters.version_file >>

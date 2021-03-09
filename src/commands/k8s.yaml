@@ -12,6 +12,7 @@ parameters:
       Application service to deploy in Kubernetes.
   version:
     type: string
+    default: "$VERSION"
     description: >
       Version of the service to deploy. This corresponds to the tag of the Docker image pulled by Kubernetes.
   env:
@@ -55,10 +56,10 @@ steps:
       name: Clone Deployment repository
       command: git clone git@github.com:cospirit/<< parameters.repository >> deployment
   - run:
-      name: Update service configuration to version << parameters.version >>
+      name: Update service version in Helm configuration file
       working_directory: deployment/clusters/<< parameters.env >>
       environment:
-        VERSION: << parameters.version >>
+        VERSION: "<< parameters.version >>"
         SERVICE_CONF_FILE: values.services.<< parameters.service >>.yaml
       command: << include(scripts/k8s_service_version.sh) >>
   - helm/install-helm-client:

@@ -17,8 +17,8 @@ teardown() {
 
     run update_service_version
 
-    [ "$(trim "${lines[3]}")" == 'version: "1.1"' ]
-    [ "$(trim "${lines[8]}")" == 'version: "2.0.1"' ]
+    [ "$(trim "${lines[2]}")" == 'version: "1.1"' ]
+    [ "$(trim "${lines[7]}")" == 'version: "2.0.1"' ]
 }
 
 @test 'K8s: Update service Helm values file succeed' {
@@ -27,6 +27,6 @@ teardown() {
     run update_service_configuration 10
 
     [ -f "${SERVICE_CONF_FILE}" ]
-    [ "$(trim "${lines[3]}")" == 'version: "1.1"' ]
-    [ "$(trim "${lines[8]}")" == 'version: "2.0.1"' ]
+    [ "$(trim "${lines[2]}")" == 'version: "1.1"' ]
+    [ "$(trim "${lines[7]}")" == 'version: "2.0.1"' ]
 }
