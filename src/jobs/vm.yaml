@@ -148,7 +148,7 @@ steps:
             name: Update version in service configuration
             working_directory: deployment/ansible/<< parameters.service >>/hosts/host_vars
             environment:
-              DEPLOY_CONF_FILE: << parameters.service >>_<< parameters.env >>.yml # ex: app_production.yml
+              DEPLOY_CONF_FILE: << parameters.service >>_<< parameters.env >>.yml # ex: myapp_production.yml
               BRANCH_PATTERN: << parameters.pattern >>
             command: << include(scripts/ansible_update_branch.sh) >>
   - run:
@@ -160,17 +160,12 @@ steps:
       steps:
         - vpn-disconnect
   - when:
-      condition:
-        and:
-          - << parameters.create_git_tag >>
-          - equal: [ production, << parameters.env >> ]
+      condition: << parameters.create_git_tag >>
       steps:
-        - run:
-            name: Move to fresh directory
-            command: |
-              mkdir "~/$CIRCLE_PROJECT_REPONAME"
-              cd "~/$CIRCLE_PROJECT_REPONAME"
+        - checkout:
+            path: "project"
         - git-tag:
             version_file: << parameters.version_file >>
-            git_email: <<parameters.git_email >>
+            working_directory: "project"
+            git_email: << parameters.git_email >>
             git_user: << parameters.git_user >>

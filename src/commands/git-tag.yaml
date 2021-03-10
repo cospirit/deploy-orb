@@ -30,21 +30,24 @@ parameters:
     description: >
       Name of the environment variable for the user name of
       Git user used to push the new tag.
-  checkout:
-    type: boolean
-    default: true
+  working_directory:
+    type: string
+    default: "."
     description: >
-      Whether to perform the CircleCI checkout step.
+      Name of the directory holding project sources.
+      If checkout parameter is 'true', repository will be cloned
+      in this directory.
 
 steps:
-  - when:
-      condition: << parameters.checkout >>
-      steps:
-        - checkout
   - run:
+      name: Export tag in environment variable
+      command: |
+        echo "export TAG=<< parameters.tag_prefix >>$(cat << parameters.version_file >>)<< parameters.tag_suffix >>" >> "$BASH_ENV"
+  - run:
+      name: Tag GitHub version
+      working_directory: "<< parameters.working_directory >>"
       environment:
-        TAG: << parameters.tag_prefix >>$(cat << parameters.version_file >>)<< parameters.tag_suffix >>
+        TAG: "${TAG}"
         GIT_USER_EMAIL: "${<< parameters.git_email >>}"
         GIT_USER_NAME: "${<< parameters.git_user >>}"
-      name: Tag GitHub version
       command: << include(scripts/git_tag.sh) >>
