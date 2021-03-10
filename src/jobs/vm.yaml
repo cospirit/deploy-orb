@@ -10,8 +10,8 @@ parameters:
       Application service to deploy.
   env:
     type: enum
-    default: "prod"
-    enum: [ "staging", "preprod", "prod" ]
+    default: "production"
+    enum: [ "staging", "preprod", "production" ]
     description: >
       Running environment.
   repository:
@@ -56,7 +56,7 @@ parameters:
       Time in second the jobs must wait to ensure the VPN connection is etablised.
   pattern:
     type: string
-    default: release\/v?(([0-9]+\.?){1,3}).*
+    default: release\/v?(([0-9]+\.?){1,3})(\-[a-zA-Z0-9\-\._]*)?
     description: >
       Regex pattern of the branch used to extract version number.
       VERSION file will be updated using this value.
@@ -135,7 +135,8 @@ steps:
       fingerprints:
         - "<< parameters.deploy_key >>"
   - run:
-      name: Deploy service << parameters.service >>
+      name: Clone << parameters.repository >> repository
+      working_directory: ~
       command: git clone git@github.com:cospirit/<< parameters.repository >>.git deployment
   - when:
       condition:
@@ -145,18 +146,14 @@ steps:
       steps:
         - run:
             name: Update version in service configuration
-            working_directory: deployment/ansible/gesco/hosts/host_vars
-            command: |
-              if [ "$(cat << parameters.service >>_<< parameters.env >>.yml | grep -oE '<< parameters.pattern >>')" != "$CIRCLE_BRANCH" ]; then
-                RELEASE_BRANCH=$(echo $CIRCLE_BRANCH | sed -E 's:\/:\\/:g')
-                sed -i '/git_branch:/ s/:.*/: '$RELEASE_BRANCH'/' << parameters.service >>_<< parameters.env >>.yml
-                head -n 11 << parameters.service >>_<< parameters.env >>.yml
-              else
-                echo "Branch is already set to $CIRCLE_BRANCH"
-              fi
+            working_directory: deployment/ansible/<< parameters.service >>/hosts/host_vars
+            environment:
+              DEPLOY_CONF_FILE: << parameters.service >>_<< parameters.env >>.yml # ex: app_production.yml
+              BRANCH_PATTERN: << parameters.pattern >>
+            command: << include(scripts/ansible_update_branch.sh) >>
   - run:
       name: Deploy service << parameters.service >>
-      working_dir: deployment
+      working_directory: deployment
       command: make << parameters.env >>@deploy.<< parameters.service >>
   - when:
       condition: << parameters.use_vpn >>
@@ -166,7 +163,7 @@ steps:
       condition:
         and:
           - << parameters.create_git_tag >>
-          - equal: [ prod, << parameters.env >> ]
+          - equal: [ production, << parameters.env >> ]
       steps:
         - run:
             name: Move to fresh directory

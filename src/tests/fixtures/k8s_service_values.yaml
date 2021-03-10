@@ -1,0 +1,20 @@
+services:
+  service:
+    version: 1.0
+    host: service.cospirit.local
+    service:
+      replicas: 3
+    sidecar:
+      version: "2.0.1"
+    workers:
+      limit: 20
+      ttl: 60
+    env:
+      # Nginx
+      NGINX_SET_REAL_IP_FROM: > # Kubernetes
+        [
+          "10.0.0.0/8"
+        ]
+      # App
+      APP_SECRET: 498TJ2SxvkJZdTvJZYPWHyD49PhPWFQa
+      APP_LOG_PATH: php://stdout

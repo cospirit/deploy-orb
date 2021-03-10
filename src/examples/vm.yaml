@@ -51,7 +51,7 @@ usage:
         - deploy/vm:
             context: my-prod-context
             service: my-awesome-app
-            env: prod
+            env: production
             use_vpn: false
             deploy_key: "f0:da:4f:34:8e:25:c3"
             name: deploy-prod

@@ -10,9 +10,9 @@ setup() {
     export VPN_CLIENT_CONFIG=$(echo "My decoded OpenVPN configuration file content." | base64)
 }
 
-@test '> OpenVPN configuration files creation success' {
+@test 'VPN: OpenVPN configuration files creation success' {
     export VPN_USERNAME=john.doe@email.com
-    export VPN_PASSWORD=P4s\$worD
+    export VPN_PASSWORD='P4s$worD'
     vpn_client_config_encoded=TXkgZGVjb2RlZCBPcGVuVlBOIGNvbmZpZ3VyYXRpb24gZmlsZSBjb250ZW50Lgo=
     vpn_client_login_file=$(printf "%s\n%s" "${VPN_USERNAME}" "${VPN_PASSWORD}")
 
@@ -24,7 +24,7 @@ setup() {
     [ "$vpn_client_login_file" == "$(cat /tmp/vpn.login)" ]
 }
 
-@test '> Fail if OpenVPN is not installed' {
+@test 'VPN: Fail if OpenVPN is not installed' {
     run requirements
 
     [ "$status" -eq 1 ]

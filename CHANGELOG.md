@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
  - Current development changes [ to be moved to release ]
 
+## [v1.0] - 2021-03-11
+### Added
+ - Add unit tests on Helm values files update of `k8s` command
+ - Add unit tests on Ansible deployment files update of `vm` job
+ - Add unit tests on environement setup of `build-image` command
+ - Add helper file with `trim` and `uuid` functions for writing tests convenience
+
+### Changed
+ - Change default branch pattern to `release\/v?(([0-9]+\.?){1,3})(\-[a-zA-Z0-9\-\._]*)?`
+
+### Fixed
+ - Use `mawk` to replace deployed version in deploy configuration files
+
 ## [v0.2.1] - 2020-01-20
 ### Added
  - Add parameter `checkout` in `git-tag` / `build-image` / `k8s` commands and jobs. This fixes the issue that get git tag creation when not in a git context.
@@ -17,7 +30,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
  - Job: `build-image` builds Docker image depending on running environnement.
  - Job: `k8s` deploys to Kubernetes cluster (only AKS is currently supported).
  - Job: `vm` can deploy with Ansible scripts
- - Job: Add `pre-deploy` and `post-deploy` parameters on `vm` job to add custom steps.
  - Command: `build-image` builds Docker image depending on running environnement.
  - Command: `k8s` deploys to Kubernetes cluster (only AKS is currently supported).
  - Add `dvelopment@build` and `dvelopment@cs.lint` make targets
@@ -43,6 +55,7 @@ Initial Release
  - Init Orb example files
 
 
+[v1.0]: https://github.com/cospirit/deploy-orb/releases/tag/v1.0
 [v0.2.1]: https://github.com/cospirit/deploy-orb/releases/tag/v0.2.1
 [v0.2]: https://github.com/cospirit/deploy-orb/releases/tag/v0.2
 [v0.1.3]: https://circleci.com/developer/orbs/orb/cospirit/deploy?version=0.1.3

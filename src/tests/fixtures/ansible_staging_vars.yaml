@@ -1,0 +1,16 @@
+### Ansible ###
+ansible_host: service.cospirit.local
+###############
+
+### Nginx ###
+nginx_server_name: '{{ project_name }}.cospirit.local'
+##############
+
+### Git ###
+git_branch: release/v1.0
+###########
+
+### Symfony ###
+locale: fr
+secret: pHHNfs4fqsP5PBwMgUBDndcveu7cYVZ9
+################
