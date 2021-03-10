@@ -1,7 +1,7 @@
 version: 2.1
 
 description: >
-  This Orb is used for CoSpirt continuous delivery.
+  This Orb is used for CoSpirit continuous delivery.
 
 display:
   source_url: "https://www.github.com/cospirit/deploy-orb"
