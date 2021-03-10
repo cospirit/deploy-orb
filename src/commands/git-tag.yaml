@@ -42,12 +42,9 @@ steps:
       steps:
         - checkout
   - run:
-      name: Set env vars
-      command: |
-        echo "export GIT_USER_EMAIL=${<< parameters.git_email >>}" >> $BASH_ENV
-        echo "export GIT_USER_NAME=${<< parameters.git_user >>}" >> $BASH_ENV
-  - run:
       environment:
         TAG: << parameters.tag_prefix >>$(cat << parameters.version_file >>)<< parameters.tag_suffix >>
+        GIT_USER_EMAIL: "${<< parameters.git_email >>}"
+        GIT_USER_NAME: "${<< parameters.git_user >>}"
       name: Tag GitHub version
       command: << include(scripts/git_tag.sh) >>
