@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
  - Current development changes [ to be moved to release ]
 
+## [v1.0.1] - 2021-03-12
+### Changed
+ - Set environment variables of `git-tag` command in step's `environment` key instead of using `BASH_ENV`
+
+### Fixed
+ - Checkout code in correct directory for git tag creation from `k8s` and `vm` jobs
+ - Build GitHub tag in a separated step
+
 ## [v1.0] - 2021-03-11
 ### Added
  - Add unit tests on Helm values files update of `k8s` command
@@ -55,6 +63,7 @@ Initial Release
  - Init Orb example files
 
 
+[v1.0.1]: https://github.com/cospirit/deploy-orb/releases/tag/v1.0.1
 [v1.0]: https://github.com/cospirit/deploy-orb/releases/tag/v1.0
 [v0.2.1]: https://github.com/cospirit/deploy-orb/releases/tag/v0.2.1
 [v0.2]: https://github.com/cospirit/deploy-orb/releases/tag/v0.2
