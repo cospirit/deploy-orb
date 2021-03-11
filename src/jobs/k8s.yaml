@@ -74,7 +74,7 @@ steps:
         - attach_workspace:
             at: ~/release
   # Export service version from file into VERSION env var.
-  # This env var is used in k8s command and is the default value
+  # This env var is used in 'k8s' command and is the default value
   # of the 'version' parameter of the command.
   - run:
       name: Get service version to deploy
@@ -93,12 +93,10 @@ steps:
   - when:
       condition: << parameters.create_git_tag >>
       steps:
-        - run:
-            name: Move to a new empty directory
-            command: |
-              mkdir -p "~/$CIRCLE_PROJECT_REPONAME"
-              cd "~/$CIRCLE_PROJECT_REPONAME"
+        - checkout:
+            path: "project"
         - git-tag:
             version_file: << parameters.version_file >>
+            working_directory: "project"
             git_email: << parameters.git_email >>
             git_user: << parameters.git_user >>

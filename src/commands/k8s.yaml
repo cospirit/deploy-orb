@@ -53,7 +53,7 @@ parameters:
 
 steps:
   - run:
-      name: Clone Deployment repository
+      name: Clone << parameters.repository >> repository
       command: git clone git@github.com:cospirit/<< parameters.repository >> deployment
   - run:
       name: Update service version in Helm configuration file
