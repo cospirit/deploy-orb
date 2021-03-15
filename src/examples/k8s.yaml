@@ -1,15 +1,16 @@
 description: >
-  Sample example to use the k8s job to deploy an app in a Kubernetes.
+  Sample example to use the k8s job to deploy an app in a Kubernetes cluster.
   In this example, the Docker image of the app is built for all branches
-  and push on ARC registry for staging and produciton environments.
+  and pushed on ACR registry for staging and produciton environments.
 
-  Docker image is then deployed to Kubernetes cluster using Helm.
-
+  Docker image is then deployed in Kubernetes using Helm.
   Image tag is passed between build and deploy with persist_tag parameter of build-image job.
 
   In production, when the deployment successfully finished, the git tag creation is triggered.
+
   The tag is corresponding to the content of a file (VERSION by default).
-  The deployments are executed on AKS clusters only for the moment.
+
+  Deployments are executed on AKS clusters only for the moment.
 usage:
   version: 2.1
   orbs:
