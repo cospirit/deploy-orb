@@ -67,7 +67,7 @@ parameters:
       Name of the file that handles the current service version number.
   create_git_tag:
     type: boolean
-    default: true
+    default: false
     description: >
       Whether to create git tag after successful production deployments.
       The value of the tag is get from VERSION file content.
