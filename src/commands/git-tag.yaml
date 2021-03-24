@@ -41,6 +41,7 @@ parameters:
 steps:
   - run:
       name: Export tag in environment variable
+      working_directory: "<< parameters.working_directory >>"
       command: |
         echo "export TAG=<< parameters.tag_prefix >>$(cat << parameters.version_file >>)<< parameters.tag_suffix >>" >> "$BASH_ENV"
   - run:
