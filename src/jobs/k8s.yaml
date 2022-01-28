@@ -51,7 +51,7 @@ parameters:
       The value of the tag is get from VERSION file content.
   helm_client_version:
     type: string
-    default: "v2.17.0"
+    default: "v3.8.0"
     description: >
       Version of Helm client to use for Kubernetes deployments.
   git_email:
