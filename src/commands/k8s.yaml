@@ -60,7 +60,7 @@ steps:
       working_directory: deployment/clusters/<< parameters.env >>
       environment:
         VERSION: "<< parameters.version >>"
-        SERVICE_CONF_FILE: values.services.<< parameters.service >>.yaml
+        SERVICE_CONF_FILE: values.connect-services.<< parameters.service >>.yaml
       command: << include(scripts/k8s_service_version.sh) >>
   - helm/install-helm-client:
       version: << parameters.helm_client_version >>
@@ -69,6 +69,7 @@ steps:
       install-kubectl: true
       perform-login: true
       resource-group: << parameters.resource_group >>
+      get-admin-credentials: true
   - run:
       name: Deploy to << parameters.env >> cluster
       working_directory: deployment/clusters/<< parameters.env >>
@@ -78,5 +79,5 @@ steps:
       working_directory: deployment
       environment:
         COMMIT_MSG: "k8s: update << parameters.service >> service version to << parameters.version >>"
-        COMMIT_FILE: clusters/<< parameters.env >>/values.services.<< parameters.service >>.yaml
+        COMMIT_FILE: clusters/<< parameters.env >>/values.connect-services.<< parameters.service >>.yaml
       command: << include(scripts/git_push.sh) >>
