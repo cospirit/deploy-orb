@@ -81,3 +81,4 @@ steps:
         COMMIT_MSG: "k8s: update << parameters.service >> service version to << parameters.version >>"
         COMMIT_FILE: clusters/<< parameters.env >>/values.connect-services.<< parameters.service >>.yaml
       command: << include(scripts/git_push.sh) >>
+
