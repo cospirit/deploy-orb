@@ -4,7 +4,7 @@ description: >
 parameters:
   image:
     type: string
-    default: ubuntu-2004:202010-01
+    default: default
     description: >
       Pick a specific circleci image variant:
       https://circleci.com/docs/2.0/configuration-reference/#available-machine-images
